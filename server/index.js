@@ -7,6 +7,11 @@ const port = process.env.PORT || 8000
 
 app.use(express.json())
 
+// import and incorporate routes
+const zooRouter = require('./routes/zooRouter')
+
+app.use('/api', zooRouter)
+
 db.on('error', console.error.bind(console, 'MongoDB Connection Error:'))
 
 app.listen(port, () => console.log(`Server running on port ${port}`));
