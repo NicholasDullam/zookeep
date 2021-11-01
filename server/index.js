@@ -14,4 +14,12 @@ app.use('/api', zooRouter)
 
 db.on('error', console.error.bind(console, 'MongoDB Connection Error:'))
 
+if (process.env.NODE_ENV === 'production') {
+    app.use(sslRedirect.default());
+    app.use(express.static('../client/build'));
+    app.get("*", (req, res) => {
+        res.sendFile(path.join(__dirname, '../client', 'build', 'index.html'));
+    });
+}
+
 app.listen(port, () => console.log(`Server running on port ${port}`));
