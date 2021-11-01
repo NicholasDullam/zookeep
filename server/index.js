@@ -1,5 +1,6 @@
 const dotenv = require('dotenv').config()
 const express = require('express');
+const sslRedirect = require('heroku-ssl-redirect')
 const db = require('./db')
 
 const app = express()
