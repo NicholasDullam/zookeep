@@ -1,4 +1,6 @@
 var mongoose = require('mongoose');
+const Enclosure = require('./enclosure')
+const Animal = require('./animal')
 
 // Zoo Schema
 const Zoo = new mongoose.Schema({
@@ -13,6 +15,16 @@ const Zoo = new mongoose.Schema({
         createdAt: 'created_at',
         updatedAt: 'updated_at'
     }
+})
+
+Zoo.post('findOneAndDelete', async (doc, next) => {
+    let enclosures = await Enclosure.find({ zoo_id: doc._id })
+    enclosures.forEach(async (enclosure) => {
+        await Enclosure.findByIdAndDelete(enclosure._id)
+        await Animal.deleteMany({ enclosure_id: enclosure._id })
+    })
+
+    next()
 })
 
 module.exports = mongoose.model('Zoo', Zoo);
