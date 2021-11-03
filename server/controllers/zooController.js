@@ -31,7 +31,7 @@ const getZoos = (req, res) => {
 
 const updateZooById = (req, res) => {
     let { _id } = req.params
-    Zoo.findOneAndUpdate(_id, req.body, { new: true }).then((response) => {
+    Zoo.findByIdAndUpdate(_id, req.body, { new: true }).then((response) => {
         return res.status(200).json(response)
     }).catch((error) => {
         return res.status(400).json({ error: error.message })
@@ -40,9 +40,10 @@ const updateZooById = (req, res) => {
 
 const deleteZooById = (req, res) => {
     let { _id } = req.params
-    Zoo.findOneAndDelete(_id).then((response) => {
+    Zoo.findByIdAndDelete(_id).then((response) => {
         return res.status(200).json(response)
     }).catch((error) => {
+        console.log(error)
         return res.status(400).json({ error: error.message })
     })
 }
