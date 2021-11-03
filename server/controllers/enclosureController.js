@@ -31,7 +31,7 @@ const getEnclosures = (req, res) => {
 
 const updateEnclosureById = (req, res) => {
     let { _id } = req.params
-    Enclosure.findOneAndUpdate(_id, req.body, { new: true }).then((response) => {
+    Enclosure.findByIdAndUpdate(_id, req.body, { new: true }).then((response) => {
         return res.status(200).json(response)
     }).catch((error) => {
         return res.status(400).json({ error: error.message })
@@ -40,7 +40,7 @@ const updateEnclosureById = (req, res) => {
 
 const deleteEnclosureById = (req, res) => {
     let { _id } = req.params
-    Enclosure.findOneAndDelete(_id).then((response) => {
+    Enclosure.findByIdAndDelete(_id).then((response) => {
         return res.status(200).json(response)
     }).catch((error) => {
         return res.status(400).json({ error: error.message })
