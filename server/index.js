@@ -1,16 +1,27 @@
 const dotenv = require('dotenv').config()
-const express = require('express');
+const cors = require('cors')
+const express = require('express')
 const sslRedirect = require('heroku-ssl-redirect')
 const db = require('./db')
 
 const app = express()
 const port = process.env.PORT || 8000
 
+app.use(cors({
+    origin: process.env.NODE_ENV === 'production' ? process.env.ORIGIN || '*' : 'http://localhost:3000' || '*',
+    credentials: true,
+    optionsSuccessStatus: 200
+}))
+
 app.use(express.json())
 
 // import and incorporate routes
+const animalRouter = require('./routes/animalRouter')
+const enclosureRouter = require('./routes/enclosureRouter')
 const zooRouter = require('./routes/zooRouter')
 
+app.use('/api', animalRouter)
+app.use('/api', enclosureRouter)
 app.use('/api', zooRouter)
 
 db.on('error', console.error.bind(console, 'MongoDB Connection Error:'))

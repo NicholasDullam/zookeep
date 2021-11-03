@@ -2,7 +2,11 @@ var mongoose = require('mongoose');
 
 // Animal Schema
 const Animal = new mongoose.Schema({
-    // put attributes here
+    name: { type: String, required: true },
+    image_url: { type: String, required: true },
+    species: { type: String, required: true },
+    food_type: { type: String, required: true },
+    enclosure_id: { type: mongoose.Types.ObjectId, ref: 'enclosures' },
 }, {
     timestamps: {
         createdAt: 'created_at',

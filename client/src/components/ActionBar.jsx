@@ -6,7 +6,7 @@ const Action = (props) => {
     const history = useHistory()
 
     return (
-        <div style={{ margin: '0px 10px 0px 10px', padding: '6px 9px 6px 9px', borderRadius: '25px', backgroundColor: location.pathname === props.path ? 'black' : '', color: location.pathname === props.path ? 'white' : '', transition: 'background-color 300ms ease', display: 'flex', alignItems: 'center'  }} onClick={() => history.push(props.path)}>
+        <div style={{ margin: '0px 10px 0px 10px', padding: '6px 9px 6px 9px', borderRadius: '25px', backgroundColor: location.pathname === props.path ? 'black' : '', color: location.pathname === props.path ? 'white' : '', transition: 'background-color 300ms ease', display: 'flex', alignItems: 'center', cursor: 'pointer', userSelect: 'none' }} onClick={() => history.push(props.path)}>
             <p style={{ margin: '0px', fontSize: '14px' }}> {props.name} </p>
         </div>
     )
