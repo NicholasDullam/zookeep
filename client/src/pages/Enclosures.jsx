@@ -115,7 +115,7 @@ const EnclosureCreateModal = props => {
                         <TextField label="Name" variant="outlined" sx={{ width: '100%' }} value={name} onChange={(e) => setName(e.target.value)}/>
                     </div>
                 </div>
-                <Button label={'Create'} loading={false} onClick={handleCreate} style={{ marginTop: 'auto' }}/>
+                <Button label={'Create'} loading={loading} onClick={handleCreate} style={{ marginTop: 'auto' }}/>
             </div>
         </ActionModal>
     )
