@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { Navbar, ActionModal, Button } from './components' 
-import { Animals, Enclosures, Home } from './pages'
+import { Animals, Enclosures, Home, Actions } from './pages'
 import { List, ListItemButton, TextField } from '@mui/material'
 import api from './api'
 import './App.css';
@@ -206,6 +206,7 @@ const App = (props) => {
             <Navbar/>
             <div style={{ padding: '0px 60px 0px 60px' }}>
               <Switch>
+                <Route path='/actions' exact component={Actions}/>
                 <Route path='/enclosures' exact component={Enclosures}/>
                 <Route path='/animals' exact component={Animals}/>
                 <Route path='/' component={Home}/>

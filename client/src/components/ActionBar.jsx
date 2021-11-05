@@ -18,6 +18,9 @@ const ActionBar = (props) => {
             <Action path={'/'} name={'Dashboard'}/>
             <Action path={'/enclosures'} name={'Enclosures'}/>
             <Action path={'/animals'} name={'Animals'}/>
+            <Action path={'/users'} name={'Users'}/>
+            <Action path={'/actions'} name={'Actions'}/>
+            <Action path={'/appointments'} name={'Appointments'}/>
         </div>
     );
 };
