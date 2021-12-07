@@ -6,6 +6,7 @@ const User = new mongoose.Schema({
     role: { type: String, required: true },
     image_url: { type: String, required: true },
     managed_by: { type: mongoose.Types.ObjectId, ref: 'users' },
+    zoo_id: { type: mongoose.Types.ObjectId, ref: 'zoos' }
 }, {
     timestamps: {
         createdAt: 'created_at',
