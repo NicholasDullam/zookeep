@@ -1,9 +1,9 @@
 const User = require('../models/user')
 
 const createUser = (req, res) => {
-    let { name, role, image_url, managed_by } = req.body
-    if (!name || !role || !image_url || !managed_by) return res.status(400).json({ error: 'Missing Fields' })
-    let user = new User({ name, role, image_url, managed_by })
+    let { name, role, image_url, managed_by, zoo_id } = req.body
+    if (!name || !role || !image_url || !zoo_id) return res.status(400).json({ error: 'Missing Fields' })
+    let user = new User({ name, role, image_url, managed_by, zoo_id })
     user.save().then((response) => {
         return res.status(200).json(response)
     }).catch((error) => {
