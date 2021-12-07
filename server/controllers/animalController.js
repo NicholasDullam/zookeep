@@ -33,7 +33,7 @@ const getAnimals = (req, res) => {
     pipeline.push({ $match: query })
     if (Object.entries(subquery).length) {
         pipeline.push({ $lookup: { from: 'enclosures', localField: 'enclosure_id', foreignField: '_id', as: 'enclosure' }})
-        pipeline.push({ $project: { $unwrap: '$enclosure' }})
+        pipeline.push({ $unwind: '$enclosure' })
         pipeline.push({ $match: subquery })
     }
 
