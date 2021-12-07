@@ -6,19 +6,19 @@ import AuthContext from '../context/AuthContext';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const EnclosureUpdateModal = props => {
+const ActionUpdateModal = props => {
     const auth = useContext(AuthContext)
     const [loading, setLoading] = useState(false)
     const [name, setName] = useState('')
-    const [zooId, setZooId] = useState(null)
+    const [enclosureId, setEnclosureId] = useState(null)
     const [zoos, setZoos] = useState([])
 
     useEffect(() => {
-        let { enclosure } = props
-        if (!enclosure) return
-        setName(enclosure.name)
-        setZooId(enclosure.zoo_id)
-    }, [props.enclosure])
+        let { action } = props
+        if (!action) return
+        setName(action.name)
+        setEnclosureId(action.enclosure_id)
+    }, [props.action])
 
     useEffect(() => {
         if (auth.zoo) return
@@ -94,7 +94,7 @@ const EnclosureCreateModal = props => {
     }
 
     return (
-        <ActionModal open={props.open} title={'Create an Enclosure'} handleClose={props.handleClose}>
+        <ActionModal open={props.open} title={'Create an Action'} handleClose={props.handleClose}>
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
                 { !auth.zoo ? <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
                     <FormControl fullWidth>
@@ -134,7 +134,7 @@ const Actions = props => {
 
     useEffect(() => {
         setLoading(true)
-        api.getEnclosures(auth.zooId ? { params: { zoo_id: auth.zooId }} : {}).then((response) => {
+        api.getActions(auth ? { params: { zoo_id: auth.zooId }} : {}).then((response) => {
             setLoading(false)
             setEnclosures(response.data.data)
         }).catch((error) => {

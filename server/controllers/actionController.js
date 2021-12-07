@@ -41,8 +41,6 @@ const getActions = (req, res) => {
     if (req.query.skip) pipeline.push({ $skip: Number(req.query.skip) })
     if (req.query.limit) pipeline.push({ $limit: Number(req.query.limit) + 1 })
 
-    console.log(pipeline)
-
     Action.aggregate(pipeline).then((response) => {
         let results = { has_more: false, data: response }
         if (req.query.limit && response.length > Number(req.query.limit)) results = { has_more: true, data: response.slice(0, response.length - 1) }
