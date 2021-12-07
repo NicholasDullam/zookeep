@@ -33,14 +33,13 @@ const getAnimals = (req, res) => {
     pipeline.push({ $match: query })
     if (Object.entries(subquery).length) {
         pipeline.push({ $lookup: { from: 'enclosures', localField: 'enclosure_id', foreignField: '_id', as: 'enclosure' }})
-        pipeline.push({ $project: { _id: '$_id', name: '$name', species: '$species', image_url: '$image_url', food_type: '$food_type', enclosure_id: '$enclosure_id', enclosure: { $arrayElemAt: [ "$enclosure", 0 ]} }})
+        pipeline.push({ $unwind: '$enclosure' })
         pipeline.push({ $match: subquery })
     }
-    
+
     if (req.query.sort) pipeline.push({ $sort: getSort(req.query.sort) })
     if (req.query.skip) pipeline.push({ $skip: Number(req.query.skip) })
     if (req.query.limit) pipeline.push({ $limit: Number(req.query.limit) + 1 })
-
 
     Animal.aggregate(pipeline).then((response) => {
         let results = { has_more: false, data: response }

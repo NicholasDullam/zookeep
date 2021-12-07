@@ -14,7 +14,7 @@ const createUser = (req, res) => {
 const getUsers = (req, res) => {
     let query = { ...req.query }, reserved = ['sort', 'skip', 'limit']
     reserved.forEach((el) => delete query[el])
-    let queryPromise = Zoo.find(query)
+    let queryPromise = User.find(query)
 
     if (req.query.sort) queryPromise = queryPromise.sort(req.query.sort)
     if (req.query.skip) queryPromise = queryPromise.skip(Number(req.query.skip))
