@@ -201,7 +201,7 @@ const App = (props) => {
     <div className="App">
       <AuthContext.Provider value={{ zoo, zooId, zooOpen, handleZooChange, handleZooOpen, handleZooClose }}>
         <SelectZooModal/>
-        <div style={{ marginTop: '150px', height: '100%' }}>
+        <div style={{ height: '100%' }}>
           <Router>
             <Navbar/>
             <div style={{ padding: '0px 60px 0px 60px' }}>
