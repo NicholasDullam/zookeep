@@ -23,6 +23,12 @@ const getZoos = (req) => connection.get('/zoos', req)
 const updateZooById = (zoo_id, payload) => connection.put(`/zoos/${zoo_id}`, payload)
 const deleteZooById = (zoo_id) => connection.delete(`/zoos/${zoo_id}`)
 
+//user routes
+const getUsers = (req) => connection.get('/users', req)
+
+//action routes
+const getActions = (req) => connection.get('/actions', req)
+
 let api = {
     createAnimal,
     getAnimals,
@@ -35,7 +41,9 @@ let api = {
     createZoo,
     getZoos,
     updateZooById,
-    deleteZooById
+    deleteZooById,
+    getUsers,
+    getActions
 }
 
 export default api

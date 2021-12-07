@@ -10,28 +10,36 @@ const ActionUpdateModal = props => {
     const auth = useContext(AuthContext)
     const [loading, setLoading] = useState(false)
     const [name, setName] = useState('')
-    const [enclosureId, setEnclosureId] = useState(null)
-    const [zoos, setZoos] = useState([])
+    const [actionId, setActionId] = useState(null)
+    const [recurring, setRecurring] = useState(false);
+    const [time, setTime] = useState('');
+    const [user_id, setUserId] = useState('');
+    const [enclosure_id, setEnclosureId] = useState('')
+    const [enclosures, setEnclosures] = useState([])
 
     useEffect(() => {
         let { action } = props
         if (!action) return
         setName(action.name)
         setEnclosureId(action.enclosure_id)
+        setRecurring(action.recurring)
+        setTime(action.time)
+        setUserId(action.user_id)
     }, [props.action])
 
     useEffect(() => {
-        if (auth.zoo) return
-        api.getZoos(auth.zooId ? { params: { zoo_id: auth.zooId }} : {}).then((response) => {
-            setZoos(response.data.data)
+        setLoading(true)
+        api.getEnclosures(auth.zooId ? { params: { zoo_id: auth.zooId }} : {}).then((response) => {
+            setLoading(false)
+            setEnclosures(response.data.data)
         }).catch((error) => {
-            console.log(error)
+            setLoading(false)
         })
     }, [auth.zoo])
 
     const handleUpdate = () => {
         setLoading(true)
-        api.updateEnclosureById(props.enclosure._id, { name, zoo_id: auth.zoo ? auth.zoo_id : zooId }).then((response) => {
+        api.updateActionById(props.action._id, { name, user_id, time, recurring, enclosure_id}).then((response) => {
             props.handleSuccess(response.data)
             setLoading(false)
         }).catch((error) => {
@@ -40,21 +48,21 @@ const ActionUpdateModal = props => {
     }
 
     return (
-        <ActionModal open={props.open} title={`Update the ${props.enclosure ? props.enclosure.name : 'name'}`} handleClose={props.handleClose}>
+        <ActionModal open={props.open} title={`Update the ${props.action ? props.action.name : 'name'}`} handleClose={props.handleClose}>
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
                 { !auth.zoo ? <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
-                    <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">Zoo</InputLabel>
-                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Enclosure" value={zooId} onChange={(e) => setZooId(e.target.value)}>
+                <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label">Enclosure</InputLabel>
+                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Enclosure" value={enclosure_id} onChange={(e) => setEnclosureId(e.target.value)}>
                             {
-                                zoos.map((zoo, i) => {
+                                enclosures.map((enclosure, i) => {
                                     return (
-                                        <MenuItem key={i} value={zoo._id}> {zoo.city}, {zoo.state} Zoo </MenuItem>
+                                        <MenuItem key={i} value={enclosure._id}> {enclosure.name} </MenuItem>
                                     )
                                 })
                             }
                         </Select>
-                    </FormControl>
+                </FormControl>
                 </div> : null }
                 <div style={{ display: 'flex', marginBottom: '20px' }}>
                     <div style={{ width: '100%' }}>
@@ -67,25 +75,40 @@ const ActionUpdateModal = props => {
     )
 }
 
-const EnclosureCreateModal = props => {
+const ActionCreateModal = props => {
     const auth = useContext(AuthContext)
     const [loading, setLoading] = useState(false)
     const [name, setName] = useState('')
-    const [zooId, setZooId] = useState(null)
-    const [zoos, setZoos] = useState([])
+    const [actionId, setActionId] = useState(null)
+    const [recurring, setRecurring] = useState(false);
+    const [time, setTime] = useState('');
+    const [user_id, setUserId] = useState('');
+    const [enclosure_id, setEnclosureId] = useState('')
+    const [enclosures, setEnclosures] = useState([])
+    const [users, setUsers] = useState([])
+
 
     useEffect(() => {
-        if (auth.zoo) return
-        api.getZoos(auth.zooId ? { params: { zoo_id: auth.zooId }} : {}).then((response) => {
-            setZoos(response.data.data)
+        api.getEnclosures(auth.zooId ? { params: { zoo_id: auth.zooId }} : {}).then((response) => {
+            setEnclosures(response.data.data)
+        }).catch((error) => {
+            console.log(error)
+        })
+    }, [auth.zoo])
+    useEffect(() => {
+        api.getUsers(auth.zooId ? { params: { zoo_id: auth.zooId }} : {}).then((response) => {
+            setUsers(response.data.data)
+            console.log(response.data.data)
         }).catch((error) => {
             console.log(error)
         })
     }, [auth.zoo])
 
+
+
     const handleCreate = () => {
         setLoading(true)
-        api.createEnclosure({ name, zoo_id: auth.zoo ? auth.zoo._id : zooId }).then((response) => {
+        api.createAction({ name, user_id, time, recurring, enclosure_id }).then((response) => {
             props.handleSuccess(response.data)
             setLoading(false)
         }).catch((error) => {
@@ -98,12 +121,24 @@ const EnclosureCreateModal = props => {
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
                 { !auth.zoo ? <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
                     <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">Zoo</InputLabel>
-                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Enclosure" value={zooId} onChange={(e) => setZooId(e.target.value)}>
+                        <InputLabel id="demo-simple-select-label">Enclosure</InputLabel>
+                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Enclosure" value={enclosure_id} onChange={(e) => setEnclosureId(e.target.value)}>
                             {
-                                zoos.map((zoo, i) => {
+                                enclosures.map((enclosure, i) => {
                                     return (
-                                        <MenuItem key={i} value={zoo._id}> {zoo.city}, {zoo.state} Zoo </MenuItem>
+                                        <MenuItem key={i} value={enclosure._id}> {enclosure.name} </MenuItem>
+                                    )
+                                })
+                            }
+                        </Select>
+                    </FormControl>
+                    <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label">User</InputLabel>
+                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="User" value={user_id} onChange={(e) => setUserId(e.target.value)}>
+                            {
+                                users.map((user, i) => {
+                                    return (
+                                        <MenuItem key={i} value={user._id}> {user.name} </MenuItem>
                                     )
                                 })
                             }
@@ -128,49 +163,49 @@ const Actions = props => {
     const [createOpen, setCreateOpen] = useState(false)
 
     const [updateOpen, setUpdateOpen] = useState(false)
-    const [updateEnclosure, setUpdateEnclosure] = useState(null)
+    const [updateAction, setUpdateAction] = useState(null)
 
-    const [enclosures, setEnclosures] = useState([])
+    const [actions, setActions] = useState([])
 
     useEffect(() => {
         setLoading(true)
-        api.getActions(auth ? { params: { zoo_id: auth.zooId }} : {}).then((response) => {
+        api.getActions(auth.zooId ? { params: { 'user.zoo_id' : auth.zooId }} : {}).then((response) => {
             setLoading(false)
-            setEnclosures(response.data.data)
+            setActions(response.data.data)
         }).catch((error) => {
             setLoading(false)
         })
     }, [auth.zoo])
 
-    const handleUpdateStart = (enclosure) => {
+    const handleUpdateStart = (action) => {
         setUpdateOpen(true)
-        setUpdateEnclosure(enclosure)
+        setUpdateAction(action)
     }
 
     const handleDelete = (enclosure_id) => {
-        api.deleteEnclosureById(enclosure_id).then((response) => {
-            setEnclosures([...enclosures.filter((enclosure) => enclosure._id !== response.data._id)])
+        api.deleteActionById(enclosure_id).then((response) => {
+            setActions([...actions.filter((action) => action._id !== response.data._id)])
         }).catch((error) => {
             console.log(error)
         })
     }
 
-    const handleUpdateSuccess = (enclosure) => {
+    const handleUpdateSuccess = (action) => {
         setUpdateOpen(false)
-        let newEnclosures = [...enclosures], newEnclosure = newEnclosures.findIndex((oldEnclosure) => oldEnclosure._id === enclosure._id)
-        newEnclosures[newEnclosure] = enclosure
-        setEnclosures(newEnclosures)
+        let newActions = [...actions], newAction = newActions.findIndex((oldAction) => oldAction._id === action._id)
+        newActions[newAction] = action
+        setActions(newActions)
     }
 
-    const handleCreateSuccess = (enclosure) => {
+    const handleCreateSuccess = (action) => {
         setCreateOpen(false)
-        setEnclosures([enclosure, ...enclosures])
+        setActions([action, ...actions])
     }
 
     return (
         <Page name={'Actions'}>
-            <EnclosureCreateModal open={createOpen} handleClose={() => setCreateOpen(false)} handleSuccess={handleCreateSuccess}/>
-            <EnclosureUpdateModal open={updateOpen} enclosure={updateEnclosure} handleClose={() => setUpdateOpen(false)} handleSuccess={handleUpdateSuccess}/>
+            <ActionCreateModal open={createOpen} handleClose={() => setCreateOpen(false)} handleSuccess={handleCreateSuccess}/>
+            <ActionUpdateModal open={updateOpen} action={updateAction} handleClose={() => setUpdateOpen(false)} handleSuccess={handleUpdateSuccess}/>
             <p style={{ textAlign: 'left', color: 'blue', marginTop: '10px', cursor: 'pointer' }} onClick={() => setCreateOpen(true)}> + Create </p>
             { loading ? <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <CircularProgress size={30}/>
@@ -188,18 +223,18 @@ const Actions = props => {
                             </TableRow>
                         </TableHead>
                         {
-                            enclosures.map((enclosure, i) => {
+                            actions.map((action, i) => {
                                 return (
                                     <TableRow key={i} style={{ position: 'relative' }}>
-                                        <TableCell> {enclosure._id} </TableCell>
-                                        <TableCell> {enclosure.name} </TableCell>
-                                        <TableCell> {enclosure.perimeter.toString() || 'None'} </TableCell>
-                                        <TableCell> {enclosure.zoo_id} </TableCell>
-                                        <TableCell> temp </TableCell>
-                                        <TableCell> Temp </TableCell>
+                                        <TableCell> {action._id} </TableCell>
+                                        <TableCell> {action.name} </TableCell>
+                                        <TableCell> {action.user_id} </TableCell>
+                                        <TableCell> {action.enclosure_id} </TableCell>
+                                        <TableCell> {action.time} </TableCell>
+                                        <TableCell> {action.recurring} </TableCell>
                                         <div style={{ display: 'flex', position: 'absolute', right: '20px', top: '50%', transform: 'translateY(-50%)'}}>
-                                            <EditIcon style={{ marginRight: '10px', fontSize: '20px', cursor: 'pointer' }} onClick={() => handleUpdateStart(enclosure)}/>
-                                            <DeleteIcon style={{ fontSize: '20px', cursor: 'pointer' }} onClick={() => handleDelete(enclosure._id)}/>
+                                            <EditIcon style={{ marginRight: '10px', fontSize: '20px', cursor: 'pointer' }} onClick={() => handleUpdateStart(action)}/>
+                                            <DeleteIcon style={{ fontSize: '20px', cursor: 'pointer' }} onClick={() => handleDelete(action._id)}/>
                                         </div>
                                     </TableRow>                                
                                 )
