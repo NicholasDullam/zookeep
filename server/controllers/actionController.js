@@ -43,7 +43,7 @@ const getActions = (req, res) => {
 
     console.log(pipeline)
 
-    Animal.aggregate(pipeline).then((response) => {
+    Action.aggregate(pipeline).then((response) => {
         let results = { has_more: false, data: response }
         if (req.query.limit && response.length > Number(req.query.limit)) results = { has_more: true, data: response.slice(0, response.length - 1) }
         return res.status(200).json(results)    
