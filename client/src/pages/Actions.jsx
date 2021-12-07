@@ -119,7 +119,7 @@ const ActionCreateModal = props => {
     return (
         <ActionModal open={props.open} title={'Create an Action'} handleClose={props.handleClose}>
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
-                { !auth.zoo ? <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
+                <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
                     <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">Enclosure</InputLabel>
                         <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Enclosure" value={enclosure_id} onChange={(e) => setEnclosureId(e.target.value)}>
@@ -144,7 +144,7 @@ const ActionCreateModal = props => {
                             }
                         </Select>
                     </FormControl>
-                </div> : null }
+                </div>
                 <div style={{ display: 'flex', marginBottom: '20px' }}>
                     <div style={{ width: '100%' }}>
                         <TextField label="Name" variant="outlined" sx={{ width: '100%' }} value={name} onChange={(e) => setName(e.target.value)}/>
