@@ -21,6 +21,7 @@ const animalRouter = require('./routes/animalRouter')
 const enclosureRouter = require('./routes/enclosureRouter')
 const zooRouter = require('./routes/zooRouter')
 const userRouter = require('./routes/userRouter')
+const appointmentRouter = require('./routes/appointmentRouter')
 const actionRouter = require('./routes/actionRouter')
 
 
@@ -29,6 +30,7 @@ app.use('/api', animalRouter)
 app.use('/api', enclosureRouter)
 app.use('/api', zooRouter)
 app.use('/api', userRouter)
+app.use('/api', appointmentRouter)
 app.use('/api', actionRouter)
 
 // db error event listener
