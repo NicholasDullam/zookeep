@@ -22,7 +22,7 @@ const enclosureRouter = require('./routes/enclosureRouter')
 const zooRouter = require('./routes/zooRouter')
 const userRouter = require('./routes/userRouter')
 const actionRouter = require('./routes/actionRouter')
-
+const healthRouter = require('./routes/actionRouter')
 
 // add routes to express app
 app.use('/api', animalRouter)
@@ -30,6 +30,7 @@ app.use('/api', enclosureRouter)
 app.use('/api', zooRouter)
 app.use('/api', userRouter)
 app.use('/api', actionRouter)
+app.use('/api', healthRouter)
 
 // db error event listener
 db.on('error', console.error.bind(console, 'MongoDB Connection Error:'))
