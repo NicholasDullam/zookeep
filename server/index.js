@@ -7,6 +7,7 @@ const db = require('./db')
 const app = express()
 const port = process.env.PORT || 8000
 
+// initialize cors policy in express app
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' ? process.env.ORIGIN || '*' : 'http://localhost:3000' || '*',
     credentials: true,
@@ -15,17 +16,22 @@ app.use(cors({
 
 app.use(express.json())
 
-// import and incorporate routes
+// import routes
 const animalRouter = require('./routes/animalRouter')
 const enclosureRouter = require('./routes/enclosureRouter')
 const zooRouter = require('./routes/zooRouter')
+const userRouter = require('./routes/userRouter')
 
+// add routes to express app
 app.use('/api', animalRouter)
 app.use('/api', enclosureRouter)
 app.use('/api', zooRouter)
+app.use('/api', userRouter)
 
+// db error event listener
 db.on('error', console.error.bind(console, 'MongoDB Connection Error:'))
 
+// handles heroku ssl redirection and client build attachment
 if (process.env.NODE_ENV === 'production') {
     app.use(sslRedirect.default());
     app.use(express.static('../client/build'));
@@ -34,4 +40,5 @@ if (process.env.NODE_ENV === 'production') {
     });
 }
 
+// start listening
 app.listen(port, () => console.log(`Server running on port ${port}`));
