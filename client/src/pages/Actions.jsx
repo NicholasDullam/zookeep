@@ -12,10 +12,11 @@ const ActionUpdateModal = props => {
     const [name, setName] = useState('')
     const [actionId, setActionId] = useState(null)
     const [recurring, setRecurring] = useState(false);
-    const [time, setTime] = useState('');
+    const [time, setTime] = useState(new Date());
     const [user_id, setUserId] = useState('');
     const [enclosure_id, setEnclosureId] = useState('')
     const [enclosures, setEnclosures] = useState([])
+    const [users, setUsers] = useState([])
 
     useEffect(() => {
         let { action } = props
@@ -36,6 +37,14 @@ const ActionUpdateModal = props => {
             setLoading(false)
         })
     }, [auth.zoo])
+    useEffect(() => {
+        api.getUsers(auth.zooId ? { params: { zoo_id: auth.zooId }} : {}).then((response) => {
+            setUsers(response.data.data)
+            console.log(response.data.data)
+        }).catch((error) => {
+            console.log(error)
+        })
+    }, [auth.zoo])
 
     const handleUpdate = () => {
         setLoading(true)
@@ -50,7 +59,7 @@ const ActionUpdateModal = props => {
     return (
         <ActionModal open={props.open} title={`Update the ${props.action ? props.action.name : 'name'}`} handleClose={props.handleClose}>
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
-                { !auth.zoo ? <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
+                <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
                 <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">Enclosure</InputLabel>
                         <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Enclosure" value={enclosure_id} onChange={(e) => setEnclosureId(e.target.value)}>
@@ -63,7 +72,26 @@ const ActionUpdateModal = props => {
                             }
                         </Select>
                 </FormControl>
-                </div> : null }
+                <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label">User</InputLabel>
+                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="User" value={user_id} onChange={(e) => setUserId(e.target.value)}>
+                            {
+                                users.map((user, i) => {
+                                    return (
+                                        <MenuItem key={i} value={user._id}> {user.name} </MenuItem>
+                                    )
+                                })
+                            }
+                        </Select>
+                </FormControl>
+                <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label">Recurring</InputLabel>
+                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Recurring" value={recurring} onChange={(e) => setRecurring(e.target.value)}>
+                                <MenuItem value={true}> True </MenuItem>
+                                <MenuItem value={false}> False </MenuItem>
+                        </Select>
+                </FormControl>
+                </div> 
                 <div style={{ display: 'flex', marginBottom: '20px' }}>
                     <div style={{ width: '100%' }}>
                         <TextField label="Name" variant="outlined" sx={{ width: '100%' }} value={name} onChange={(e) => setName(e.target.value)}/>
@@ -81,7 +109,7 @@ const ActionCreateModal = props => {
     const [name, setName] = useState('')
     const [actionId, setActionId] = useState(null)
     const [recurring, setRecurring] = useState(false);
-    const [time, setTime] = useState('');
+    const [time, setTime] = useState(new Date())
     const [user_id, setUserId] = useState('');
     const [enclosure_id, setEnclosureId] = useState('')
     const [enclosures, setEnclosures] = useState([])
@@ -144,9 +172,16 @@ const ActionCreateModal = props => {
                             }
                         </Select>
                     </FormControl>
+                    <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label">Recurring</InputLabel>
+                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Recurring" value={recurring} onChange={(e) => setRecurring(e.target.value)}>
+                                <MenuItem value={true}> True </MenuItem>
+                                <MenuItem value={false}> False </MenuItem>
+                        </Select>
+                    </FormControl>
                 </div>
                 <div style={{ display: 'flex', marginBottom: '20px' }}>
-                    <div style={{ width: '100%' }}>
+                    <div style={{ width: '100%', marginRight: '10px' }}>
                         <TextField label="Name" variant="outlined" sx={{ width: '100%' }} value={name} onChange={(e) => setName(e.target.value)}/>
                     </div>
                 </div>
@@ -169,7 +204,7 @@ const Actions = props => {
 
     useEffect(() => {
         setLoading(true)
-        api.getActions(auth.zooId ? { params: { 'user.zoo_id' : auth.zooId }} : {}).then((response) => {
+        api.getActions(auth.zooId ? { params: { 'enclosure.zoo_id' : auth.zooId }} : {}).then((response) => {
             setLoading(false)
             setActions(response.data.data)
         }).catch((error) => {
