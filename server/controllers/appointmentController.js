@@ -4,8 +4,8 @@ const User = require('../models/user')
 const mongoose = require('mongoose')
 
 const createAppointment = async (req, res) => {
-    let { user_id, animal_id, time, status } = req.body
-    if (!user_id || !animal_id || !time || !status) return res.status(400).json({ error: 'Missing Fields' })
+    let { user_id, animal_id, time } = req.body
+    if (!user_id || !animal_id || !time) return res.status(400).json({ error: 'Missing Fields' })
 
     // starts transaction to check if animal and user exist
     let session = await mongoose.startSession()
