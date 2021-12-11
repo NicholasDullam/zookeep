@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from 'react'
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { Navbar, ActionModal, Button } from './components' 
 import { Animals, Enclosures, Home, Actions, Users, Appointments } from './pages'
-import { List, ListItemButton, TextField } from '@mui/material'
+import { List, TextField, ListItemButton } from '@mui/material'
 import api from './api'
 import './App.css';
 import AuthContext from './context/AuthContext';

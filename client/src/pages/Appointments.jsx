@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Page, ActionModal, Button } from '../components'
-import { TextField, Select, MenuItem, Table, TableContainer, TableCell, TableHead, CircularProgress, TableRow, FormControl, InputLabel } from '@mui/material'
+import { TextField, Select, Table, TableContainer, TableCell, TableHead, CircularProgress, TableRow, FormControl, InputLabel } from '@mui/material'
+import { MenuItem } from '@material-ui/core'
 import api from '../api'
 import AuthContext from '../context/AuthContext';
 import EditIcon from '@mui/icons-material/Edit';
