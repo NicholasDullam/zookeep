@@ -1,21 +1,35 @@
 const Action = require('../models/action')
+const User = require('../models/user')
+const Enclosure = require('../models/enclosure')
 const mongoose = require('mongoose')
 
-const createAction = (req, res) => {
-    console.log(req.body)
+const createAction = async (req, res) => {
     let { name, user_id, time, recurring, enclosure_id } = req.body
     if (!name, !user_id || !time || !enclosure_id) return res.status(400).json({ error: 'Missing Fields' })
-    let action = new Action({ name, user_id, time, recurring, enclosure_id })
-    action.save().then((response) => {
+
+    // starts transaction to check if user and enclosure exist
+    let session = await mongoose.startSession()
+    session.startTransaction()
+
+    try {
+        const user = await User.findById(user_id)
+        if (!user) throw new Error('user does not exist')
+        const enclosure = await Enclosure.findById(enclosure_id)
+        if (!enclosure) throw new Error('enclosure does not exist')
+        let action = new Action({ name, user_id, time, recurring, enclosure_id })
+        const response = await action.save()
+        await session.commitTransaction()
+        session.endSession()
         return res.status(200).json(response)
-    }).catch((error) => {
-        console.log(error)
+    } catch (error) { 
+        await session.abortTransaction()
+        session.endSession()
         return res.status(400).json({ error: error.message })
-    })
+    }
 }
 
 const getActions = (req, res) => {
-    let query = { ...req.query }, subquery = {}, reserved = ['sort', 'skip', 'limit', 'q'], indices = ['enclosure.zoo_id'], subqueryParams=['enclosure.zoo_id'], pipeline = []
+    let query = { ...req.query }, subquery = {}, reserved = ['sort', 'skip', 'limit', 'q'], indices = ['enclosure.zoo_id', 'user_id'], subqueryParams=['enclosure.zoo_id'], pipeline = []
     
     indices.forEach((el) => {
         if (query[el]) query[el] = mongoose.Types.ObjectId(query[el])

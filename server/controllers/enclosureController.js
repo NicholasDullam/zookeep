@@ -1,14 +1,28 @@
 const Enclosure = require('../models/enclosure')
+const Zoo = require('../models/zoo')
+const mongoose = require('mongoose')
 
-const createEnclosure = (req, res) => {
+const createEnclosure = async (req, res) => {
     let { name, zoo_id } = req.body
     if (!name || !zoo_id) return res.status(400).json({ error: 'Missing Fields' })
-    let enclosure = new Enclosure({ name, zoo_id })
-    enclosure.save().then((response) => {
+
+    // starts transaction to check if zoo
+    let session = await mongoose.startSession()
+    session.startTransaction()
+
+    try {
+        const zoo = await Zoo.findById(zoo_id)
+        if (!zoo) throw new Error('zoo does not exist')
+        let enclosure = new Enclosure({ name, zoo_id })
+        const response = await enclosure.save()
+        await session.commitTransaction()
+        session.endSession()
         return res.status(200).json(response)
-    }).catch((error) => {
+    } catch (error) {
+        await session.abortTransaction()
+        session.endSession()
         return res.status(400).json({ error: error.message })
-    })
+    }
 }
 
 const getEnclosures = (req, res) => {

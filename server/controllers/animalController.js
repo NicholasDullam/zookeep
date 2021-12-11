@@ -1,15 +1,28 @@
 const Animal = require('../models/animal')
+const Enclosure = require('../models/enclosure')
 const mongoose = require('mongoose')
 
-const createAnimal = (req, res) => {
+const createAnimal = async (req, res) => {
     let { name, species, food_type, image_url, enclosure_id } = req.body
     if (!name || !species || !food_type || !image_url || !enclosure_id) return res.status(400).json({ error: 'Missing Fields' })
-    let animal = new Animal({ name, species, food_type, image_url, enclosure_id })
-    animal.save().then((response) => {
+
+    // starts transaction to check if enclosure exist
+    let session = await mongoose.startSession()
+    session.startTransaction()
+
+    try {
+        const enclosure = Enclosure.findById(enclosure_id)
+        if (!enclosure) throw new Error('enclosure does not exist')
+        let animal = new Animal({ name, species, food_type, image_url, enclosure_id })
+        const response = await animal.save()
+        await session.commitTransaction()
+        session.endSession()
         return res.status(200).json(response)
-    }).catch((error) => {
+    } catch (error) { 
+        await session.abortTransaction()
+        session.endSession()
         return res.status(400).json({ error: error.message })
-    })
+    }
 }
 
 const getAnimals = (req, res) => {

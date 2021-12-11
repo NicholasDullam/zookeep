@@ -2,12 +2,12 @@ import Home from './Home'
 import Enclosures from './Enclosures'
 import Animals from './Animals'
 import Actions from './Actions'
-import Appointments from './Appointments'
+import Users from './Users'
 
 export {
     Home,
     Enclosures,
     Animals,
     Actions,
-    Appointments
+    Users
 }

@@ -7,7 +7,7 @@ const Navbar = (props) => {
     const auth = useContext(AuthContext)
 
     return (
-        <div style={{ position: 'sticky', top: '0px', width: '100%' }}>
+        <div style={{ position: 'sticky', top: '0px', width: '100%', overflow: 'hidden' }}>
             <div style={{ backgroundColor: 'white', backgroundColor: 'rgba(240,240,240,1)', padding: '10px', height: '50px', display: 'flex', alignItems: 'center', width: '100%', zIndex: '1', borderBottom: '1px solid rgba(0,0,0,.1)' }}>
                 <div>
                     <div style={{ border: '1px solid rgba(0,0,0,.2)', borderRadius: '25px', padding: '10px 15px 10px 15px', marginLeft: '25px', display: 'flex', alignItems: 'center', userSelect: 'none', cursor: 'pointer' }} onClick={auth.handleZooOpen}>
