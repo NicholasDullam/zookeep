@@ -8,6 +8,7 @@ import api from '../api'
 import AuthContext from '../context/AuthContext';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 const AppointmentUpdateModal = props => {
     const auth = useContext(AuthContext)
@@ -60,6 +61,118 @@ const AppointmentUpdateModal = props => {
 
     return ( //IDK NAME PART OR MAP PART
 <ActionModal open={props.open} title={'Update an Appointment'} handleClose={props.handleClose}>
+            <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
+                <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
+                    <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label">User</InputLabel>
+                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="User" value={user_id} onChange={(e) => setUserId(e.target.value)}>
+                            {
+                                users.map((user, i) => {
+                                    return (
+                                        <MenuItem key={i} value={user._id}> {user.name} </MenuItem>
+                                    )
+                                })
+                            }
+                        </Select>
+                    </FormControl>
+                    </div>
+                    <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
+                    <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label">Animal</InputLabel>
+                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Animal" value={animal_id} onChange={(e) => setAnimalId(e.target.value)}>
+                            {
+                                animals.map((animal, i) => {
+                                    return (
+                                        <MenuItem key={i} value={animal._id}> {animal.name} </MenuItem>
+                                    )
+                                })
+                            }
+                        </Select>
+                    </FormControl>
+                    </div>
+                    <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
+                    <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label">Status</InputLabel>
+                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Status" value={status} onChange={(e) => setStatus(e.target.value)}>
+                                <MenuItem value={"Completed"}> Completed </MenuItem>
+                                <MenuItem value={"Uncompleted"}> Uncompleted </MenuItem>
+                        </Select>
+                    </FormControl>
+                </div>
+                <div style={{ display: 'flex', marginBottom: '20px' }}>
+                    <div style={{ width: '100%', marginRight: '10px' }}>
+                        <TextField label="Time" variant="outlined" sx={{ width: '100%' }} value={time} onChange={(e) => setTime(e.target.value)}/>
+                    </div>
+                </div>
+                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <DateTimePicker
+                        label="DateTimePicker"
+                        inputVariant="outlined"
+                        value={time}
+                        onChange={setTime}
+                    
+                    />
+                </MuiPickersUtilsProvider>
+                <Button label={'Update'} loading={false} onClick={handleUpdate} style={{ marginTop: 'auto' }}/>
+            </div>
+        </ActionModal>
+    )
+}
+const AppointmentCompleteModal = props => {
+    const auth = useContext(AuthContext)
+    const [loading, setLoading] = useState(false)
+    const [user_id, setUserId] = useState([])
+    const [animal_id, setAnimalId] = useState([])
+    const [time, setTime] = useState(new Date())
+    const [status, setStatus] = useState('')
+    const [enclosure_id, setEnclosureId] = useState('')
+    const [enclosures, setEnclosures] = useState([])
+    const [animals, setAnimals] = useState([])
+    const [heart_rate, setHeartRate] = useState([])
+    const [weight, setWeight] = useState([])
+    const [notes, setNotes] = useState([])
+
+
+    const [users, setUsers] = useState([])
+    const [name, setName] = useState('')
+
+
+    useEffect(() => {
+        let { appointment } = props
+        if (!appointment) return
+        setUserId(appointment.user_id)
+        setAnimalId(appointment.animal_id)
+        setTime(appointment.time)
+        setStatus(appointment.status)
+    }, [props.appointment])
+
+    useEffect(() => {
+        api.getUsers(auth.userId ? { params: { user_id: auth.userId }} : {}).then((response) => {
+            setUsers(response.data.data)
+        }).catch((error) => {
+            console.log(error)
+        })
+    }, [auth.zoo])
+    useEffect(() => {
+        api.getAnimals(auth.userId ? { params: { user_id: auth.userId }} : {}).then((response) => {
+            setAnimals(response.data.data)
+        }).catch((error) => {
+            console.log(error)
+        })
+    }, [auth.zoo])
+
+    const handleCreateHealth = () => {
+        setLoading(true)
+        api.createHealth({ heart_rate, weight, notes, animal_id }).then((response) => {
+            props.handleSuccess(response.data)
+            setLoading(false)
+        }).catch((error) => {
+            setLoading(false)
+        })
+    }
+
+    return ( //IDK NAME PART OR MAP PART
+<ActionModal open={props.open} title={'Complete an Appointment'} handleClose={props.handleClose}>
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
                 <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
                     <FormControl fullWidth>
@@ -222,6 +335,9 @@ const Appointments = props => {
     const [createOpen, setCreateOpen] = useState(false)
 
     const [updateOpen, setUpdateOpen] = useState(false)
+    const [completeOpen, setCompleteOpen] = useState(false)
+    const [completeAppointment, setCompleteAppointment] = useState(null)
+
     const [updateAppointment, setUpdateAppointment] = useState(null)
 
     const [appointments, setAppointments] = useState([])
@@ -240,6 +356,10 @@ const Appointments = props => {
         setUpdateOpen(true)
         setUpdateAppointment(appointment)
     }
+    const handleCompleteStart = (appointment) => {
+        setCompleteOpen(true)
+        setCompleteAppointment(appointment)
+    }
 
     const handleDelete = (appointment_id) => {
         api.deleteAppointmentById(appointment_id).then((response) => {
@@ -255,6 +375,11 @@ const Appointments = props => {
         newAppointments[newAppointment] = appointment
         setAppointments(newAppointments)
     }
+    
+    const handleCompleteSuccess = (appointment) => {
+        setCompleteOpen(false)
+
+    }
 
     const handleCreateSuccess = (appointment) => {
         setCreateOpen(false)
@@ -265,6 +390,8 @@ const Appointments = props => {
         <Page name={'Appointments'}>
             <AppointmentCreateModal open={createOpen} handleClose={() => setCreateOpen(false)} handleSuccess={handleCreateSuccess}/>
             <AppointmentUpdateModal open={updateOpen} appointment={updateAppointment} handleClose={() => setUpdateOpen(false)} handleSuccess={handleUpdateSuccess}/>
+            <AppointmentCompleteModal open={completeOpen} appointment={completeAppointment} handleClose={() => setCompleteOpen(false)} handleSuccess={handleCompleteSuccess}/>
+
             <p style={{ textAlign: 'left', color: 'blue', marginTop: '10px', cursor: 'pointer' }} onClick={() => setCreateOpen(true)}> + Create </p>
             { loading ? <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <CircularProgress size={30}/>
@@ -292,6 +419,7 @@ const Appointments = props => {
                                         <div style={{ display: 'flex', position: 'absolute', right: '20px', top: '50%', transform: 'translateY(-50%)'}}>
                                             <EditIcon style={{ marginRight: '10px', fontSize: '20px', cursor: 'pointer' }} onClick={() => handleUpdateStart(appointment)}/>
                                             <DeleteIcon style={{ fontSize: '20px', cursor: 'pointer' }} onClick={() => handleDelete(appointment._id)}/>
+                                            <CheckCircleOutlineIcon style={{ fontSize: '20px', cursor: 'pointer' }} onClick={() => handleCompleteStart(appointment._id)}/>
                                         </div>
                                     </TableRow>                                
                                 )
