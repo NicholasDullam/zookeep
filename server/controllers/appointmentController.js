@@ -36,7 +36,7 @@ const getAppointments = (req, res) => {
     })
 
     reserved.forEach((el) => {
-        delete queryUser[el]
+        delete query[el]
     })
 
     subqueryParams.forEach((el) => {
