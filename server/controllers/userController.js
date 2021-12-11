@@ -1,15 +1,18 @@
 const User = require('../models/user')
 const Zoo = require('../models/zoo')
+const mongoose = require('mongoose')
 
 const createUser = async (req, res) => {
     let { name, role, image_url, managed_by, zoo_id } = req.body
     if (!name || !role || !image_url || !zoo_id) return res.status(400).json({ error: 'Missing Fields' })
 
-    // starts transaction to check if zoo exists
-    let session = await Zoo.startSession()
+    // starts transaction to check if zoo and manager exist
+    let session = await mongoose.startSession()
     session.startTransaction()
 
     try {
+        const manager = await User.findById(managed_by)
+        if (!manager && managed_by) throw new Error('manager does not exist')
         const zoo = await Zoo.findById(zoo_id)
         if (!zoo) throw new Error('zoo does not exist')
         let user = new User({ name, role, image_url, managed_by, zoo_id })
@@ -18,6 +21,8 @@ const createUser = async (req, res) => {
         session.endSession()
         return res.status(200).json(response)
     } catch (error) {
+        await session.abortTransaction()
+        session.endSession()
         return res.status(400).json({ error: error.message })
     }
 }
