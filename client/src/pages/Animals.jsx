@@ -15,6 +15,8 @@ const AnimalViewModal = props => {
     const [image_url, setImageUrl] = useState('')
     const [food_type, setFoodType] = useState('')
     const [enclosures, setEnclosures] = useState([])
+    const [health, setHealth] = useState([])
+
 
     useEffect(() => {
         let { animal } = props
@@ -31,6 +33,16 @@ const AnimalViewModal = props => {
             setEnclosures(response.data.data)
         }).catch((error) => {
             console.log(error)
+        })
+    }, [auth.zoo])
+
+    useEffect(() => {
+        setLoading(true)
+        api.getHealth(auth.zooId ? { params: { 'enclosure.zoo_id' : auth.zooId }} : {}).then((response) => {
+            setLoading(false)
+            setHealth(response.data.data)
+        }).catch((error) => {
+            setLoading(false)
         })
     }, [auth.zoo])
 
@@ -246,6 +258,7 @@ const Animals = props => {
             setLoading(false)
         })
     }, [auth.zoo])
+    
 
     const handleCreateSuccess = (animal) => {
         setCreateOpen(false)

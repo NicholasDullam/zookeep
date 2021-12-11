@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Page, ActionModal, Button } from '../components'
-import { TextField, Select, MenuItem, Table, TableContainer, TableCell, TableHead, CircularProgress, TableRow, FormControl, InputLabel } from '@mui/material'
+import { TextField, Select, MenuItem, Table, TableContainer, TableCell, TableHead, CircularProgress, TableRow, FormControl, InputLabel, DateAdapterfns } from '@mui/material'
+import { DateTimePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
+import DateFnsUtils from '@date-io/date-fns';
 import api from '../api'
 import AuthContext from '../context/AuthContext';
 import EditIcon from '@mui/icons-material/Edit';
@@ -72,6 +74,8 @@ const ActionUpdateModal = props => {
                             }
                         </Select>
                 </FormControl>
+                </div>
+                <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
                 <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">User</InputLabel>
                         <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="User" value={user_id} onChange={(e) => setUserId(e.target.value)}>
@@ -84,6 +88,9 @@ const ActionUpdateModal = props => {
                             }
                         </Select>
                 </FormControl>
+                </div>
+                <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
+
                 <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">Recurring</InputLabel>
                         <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Recurring" value={recurring} onChange={(e) => setRecurring(e.target.value)}>
@@ -97,6 +104,15 @@ const ActionUpdateModal = props => {
                         <TextField label="Name" variant="outlined" sx={{ width: '100%' }} value={name} onChange={(e) => setName(e.target.value)}/>
                     </div>
                 </div>
+                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <DateTimePicker
+                        label="DateTimePicker"
+                        inputVariant="outlined"
+                        value={time}
+                        onChange={setTime}
+                    
+                    />
+                </MuiPickersUtilsProvider>
                 <Button label={'Update'} loading={false} onClick={handleUpdate} style={{ marginTop: 'auto' }}/>
             </div>
         </ActionModal>
@@ -160,6 +176,9 @@ const ActionCreateModal = props => {
                             }
                         </Select>
                     </FormControl>
+                </div>
+                <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
+
                     <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">User</InputLabel>
                         <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="User" value={user_id} onChange={(e) => setUserId(e.target.value)}>
@@ -172,6 +191,8 @@ const ActionCreateModal = props => {
                             }
                         </Select>
                     </FormControl>
+                </div>
+                <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
                     <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">Recurring</InputLabel>
                         <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Recurring" value={recurring} onChange={(e) => setRecurring(e.target.value)}>
@@ -184,6 +205,18 @@ const ActionCreateModal = props => {
                     <div style={{ width: '100%', marginRight: '10px' }}>
                         <TextField label="Name" variant="outlined" sx={{ width: '100%' }} value={name} onChange={(e) => setName(e.target.value)}/>
                     </div>
+                </div>
+                <div style={{ display: 'flex', marginBottom: '20px' }}>
+
+                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <DateTimePicker
+                    label="DateTimePicker"
+                    inputVariant="outlined"
+                    value={time}
+                    onChange={setTime}
+                   
+                />
+                </MuiPickersUtilsProvider>
                 </div>
                 <Button label={'Create'} loading={false} onClick={handleCreate} style={{ marginTop: 'auto' }}/>
             </div>
