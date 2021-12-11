@@ -1,8 +1,7 @@
 var mongoose = require('mongoose');
 
-// Animal Schema
-const Animal = new mongoose.Schema({
-    name: { type: String, required: true },
+// Health Schema
+const Health = new mongoose.Schema({
     heart_rate: { type: Number, required: true },
     weight: { type: Number, Double: true },
     notes: { type: String, required: true },

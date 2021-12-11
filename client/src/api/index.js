@@ -29,6 +29,10 @@ const getUsers = (req) => connection.get('/users', req)
 const updateUserById = (user_id, payload) => connection.put(`/users/${user_id}`, payload)
 const deleteUserById = (user_id) => connection.delete(`/users/${user_id}`)
 
+// health routes
+const createHealth = (payload) => connection.post('/health', payload)
+const getHealth = (req) => connection.get('/health', req)
+
 // appointment routes
 const createAppointment = (payload) => connection.post('/appointments', payload)
 const getAppointments = (req) => connection.get('/appointments', req)
@@ -65,8 +69,9 @@ let api = {
     getActions,
     createAction,
     updateActionById,
-    deleteActionById
-
+    deleteActionById,
+    createHealth,
+    getHealth
 }
 
 export default api
