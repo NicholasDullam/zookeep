@@ -17,13 +17,9 @@ const AppointmentUpdateModal = props => {
     const [animal_id, setAnimalId] = useState([])
     const [time, setTime] = useState(new Date())
     const [status, setStatus] = useState('')
-    const [enclosure_id, setEnclosureId] = useState('')
-    const [enclosures, setEnclosures] = useState([])
     const [animals, setAnimals] = useState([])
 
     const [users, setUsers] = useState([])
-    const [name, setName] = useState('')
-
 
     useEffect(() => {
         let { appointment } = props
@@ -119,113 +115,40 @@ const AppointmentUpdateModal = props => {
     )
 }
 const AppointmentCompleteModal = props => {
-    const auth = useContext(AuthContext)
-    const [loading, setLoading] = useState(false)
-    const [user_id, setUserId] = useState([])
-    const [animal_id, setAnimalId] = useState([])
-    const [time, setTime] = useState(new Date())
-    const [status, setStatus] = useState('')
-    const [enclosure_id, setEnclosureId] = useState('')
-    const [enclosures, setEnclosures] = useState([])
-    const [animals, setAnimals] = useState([])
     const [heart_rate, setHeartRate] = useState([])
     const [weight, setWeight] = useState([])
     const [notes, setNotes] = useState([])
 
-
-    const [users, setUsers] = useState([])
-    const [name, setName] = useState('')
-
-
-    useEffect(() => {
-        let { appointment } = props
-        if (!appointment) return
-        setUserId(appointment.user_id)
-        setAnimalId(appointment.animal_id)
-        setTime(appointment.time)
-        setStatus(appointment.status)
-    }, [props.appointment])
-
-    useEffect(() => {
-        api.getUsers(auth.userId ? { params: { user_id: auth.userId }} : {}).then((response) => {
-            setUsers(response.data.data)
-        }).catch((error) => {
-            console.log(error)
-        })
-    }, [auth.zoo])
-    useEffect(() => {
-        api.getAnimals(auth.userId ? { params: { user_id: auth.userId }} : {}).then((response) => {
-            setAnimals(response.data.data)
-        }).catch((error) => {
-            console.log(error)
-        })
-    }, [auth.zoo])
-
     const handleCreateHealth = () => {
-        setLoading(true)
-        api.createHealth({ heart_rate, weight, notes, animal_id }).then((response) => {
+        if (!props.appointment) return
+        api.createHealth({ heart_rate, weight, notes, animal_id: props.appointment.animal_id }).then((response) => {
+            return api.updateAppointmentById(props.appointment._id, { status: 'done' })
+        }).then((response) => {
             props.handleSuccess(response.data)
-            setLoading(false)
         }).catch((error) => {
-            setLoading(false)
+            console.log(error)
         })
     }
 
-    return ( //IDK NAME PART OR MAP PART
-<ActionModal open={props.open} title={'Complete an Appointment'} handleClose={props.handleClose}>
+    return (
+        <ActionModal open={props.open} title={'Complete this Appointment'} handleClose={props.handleClose}>
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
-                <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
-                    <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">User</InputLabel>
-                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="User" value={user_id} onChange={(e) => setUserId(e.target.value)}>
-                            {
-                                users.map((user, i) => {
-                                    return (
-                                        <MenuItem key={i} value={user._id}> {user.name} </MenuItem>
-                                    )
-                                })
-                            }
-                        </Select>
-                    </FormControl>
+                <div style={{ display: 'flex', marginBottom: '20px' }}>
+                    <div style={{ width: '100%', marginRight: '10px' }}>
+                        <TextField label="Weight" variant="outlined" type={'number'} sx={{ width: '100%' }} value={weight} onChange={(e) => setWeight(e.target.value)}/>
                     </div>
-                    <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
-                    <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">Animal</InputLabel>
-                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Animal" value={animal_id} onChange={(e) => setAnimalId(e.target.value)}>
-                            {
-                                animals.map((animal, i) => {
-                                    return (
-                                        <MenuItem key={i} value={animal._id}> {animal.name} </MenuItem>
-                                    )
-                                })
-                            }
-                        </Select>
-                    </FormControl>
-                    </div>
-                    <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
-                    <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">Status</InputLabel>
-                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Status" value={status} onChange={(e) => setStatus(e.target.value)}>
-                                <MenuItem value={"Completed"}> Completed </MenuItem>
-                                <MenuItem value={"Uncompleted"}> Uncompleted </MenuItem>
-                        </Select>
-                    </FormControl>
                 </div>
                 <div style={{ display: 'flex', marginBottom: '20px' }}>
                     <div style={{ width: '100%', marginRight: '10px' }}>
-                        <TextField label="Time" variant="outlined" sx={{ width: '100%' }} value={time} onChange={(e) => setTime(e.target.value)}/>
+                        <TextField label="Heart Rate" variant="outlined" type={'number'} sx={{ width: '100%' }} value={heart_rate} onChange={(e) => setHeartRate(e.target.value)}/>
                     </div>
                 </div>
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                    <DateTimePicker
-                        label="DateTimePicker"
-                        inputVariant="outlined"
-                        value={time}
-                        onChange={setTime}
-                    
-                    />
-                </MuiPickersUtilsProvider>
-                <Button label={'Update'} loading={false} onClick={handleUpdate} style={{ marginTop: 'auto' }}/>
+                <div style={{ display: 'flex', marginBottom: '20px' }}>
+                    <div style={{ width: '100%', marginRight: '10px' }}>
+                        <TextField label="Notes" variant="outlined" sx={{ width: '100%' }} value={notes} onChange={(e) => setNotes(e.target.value)}/>
+                    </div>
+                </div>
+                <Button label={'Complete'} loading={false} onClick={handleCreateHealth} style={{ marginTop: 'auto' }}/>
             </div>
         </ActionModal>
     )
@@ -335,10 +258,10 @@ const Appointments = props => {
     const [createOpen, setCreateOpen] = useState(false)
 
     const [updateOpen, setUpdateOpen] = useState(false)
+    const [updateAppointment, setUpdateAppointment] = useState(null)
+
     const [completeOpen, setCompleteOpen] = useState(false)
     const [completeAppointment, setCompleteAppointment] = useState(null)
-
-    const [updateAppointment, setUpdateAppointment] = useState(null)
 
     const [appointments, setAppointments] = useState([])
 
@@ -378,7 +301,9 @@ const Appointments = props => {
     
     const handleCompleteSuccess = (appointment) => {
         setCompleteOpen(false)
-
+        let newAppointments = [...appointments], newAppointment = newAppointments.findIndex((oldAppointment) => oldAppointment._id === appointment._id)
+        newAppointments[newAppointment] = appointment
+        setAppointments(newAppointments)
     }
 
     const handleCreateSuccess = (appointment) => {
@@ -418,8 +343,8 @@ const Appointments = props => {
                                         <TableCell> {appointment.status} </TableCell>
                                         <div style={{ display: 'flex', position: 'absolute', right: '20px', top: '50%', transform: 'translateY(-50%)'}}>
                                             <EditIcon style={{ marginRight: '10px', fontSize: '20px', cursor: 'pointer' }} onClick={() => handleUpdateStart(appointment)}/>
-                                            <DeleteIcon style={{ fontSize: '20px', cursor: 'pointer' }} onClick={() => handleDelete(appointment._id)}/>
-                                            <CheckCircleOutlineIcon style={{ fontSize: '20px', cursor: 'pointer' }} onClick={() => handleCompleteStart(appointment._id)}/>
+                                            <DeleteIcon style={{ fontSize: '20px', cursor: 'pointer', marginRight: appointment.status === 'done' ? '0px' : '10px' }} onClick={() => handleDelete(appointment._id)}/>
+                                            { appointment.status !== 'done' ? <CheckCircleOutlineIcon style={{ fontSize: '20px', cursor: 'pointer' }} onClick={() => handleCompleteStart(appointment)}/> : null }
                                         </div>
                                     </TableRow>                                
                                 )

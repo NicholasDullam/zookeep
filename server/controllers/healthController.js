@@ -3,8 +3,9 @@ const Animal = require('../models/animal')
 const mongoose = require('mongoose')
 
 const createHealth = async (req, res) => {
-    let { name, heart_rate, weight, notes, animal_id } = req.body
-    if (!name || !heart_rate || !weight || !notes || !animal_id) return res.status(400).json({ error: 'Missing Fields' })
+    let { heart_rate, weight, notes, animal_id } = req.body
+    console.log(req.body)
+    if (!heart_rate || !weight || !notes || !animal_id) return res.status(400).json({ error: 'Missing Fields' })
     
     // starts transaction to check if animal exists
     let session = await mongoose.startSession()
@@ -13,7 +14,7 @@ const createHealth = async (req, res) => {
     try { 
         const animal = Animal.findById(animal_id)
         if (!animal) throw new Error('animal does not exist')
-        let health = new Health({ name, heart_rate, weight, notes, animal_id })
+        let health = new Health({ heart_rate, weight, notes, animal_id })
         const response = health.save()
         await session.commitTransaction()
         session.endSession()

@@ -23,7 +23,7 @@ const zooRouter = require('./routes/zooRouter')
 const userRouter = require('./routes/userRouter')
 const appointmentRouter = require('./routes/appointmentRouter')
 const actionRouter = require('./routes/actionRouter')
-const healthRouter = require('./routes/actionRouter')
+const healthRouter = require('./routes/healthRouter')
 
 // add routes to express app
 app.use('/api', animalRouter)

@@ -9,11 +9,21 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 const AnimalViewModal = props => {
     const [enclosure, setEnclosure] = useState(null)
+    const [health, setHealth] = useState([])
     
     useEffect(() => {
         if (!props.animal) return
         api.getEnclosures({ params: { _id: props.animal.enclosure_id } }).then((response) => {
             if (response.data.data.length) setEnclosure(response.data.data[0])
+        }).catch((error) => {
+            console.log(error)
+        })
+    }, [props.animal])
+
+    useEffect(() => {
+        if (!props.animal) return
+        api.getHealth({ params: { animal_id: props.animal._id } }).then((response) => {
+            setHealth(response.data.data)
         }).catch((error) => {
             console.log(error)
         })
@@ -40,6 +50,13 @@ const AnimalViewModal = props => {
                         Food Type: {props.animal.food_type}
                     </div>
                     <h3>Health Data</h3>
+                    {
+                        health.map((instance) => {
+                            return <div>
+                                Weight: {instance.weight}, Heart Rate: {instance.heart_rate}, Notes: {instance.notes}
+                            </div>
+                        })
+                    }
                 </div>
             </div> : null }
         </ActionModal>
