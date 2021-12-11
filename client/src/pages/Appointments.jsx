@@ -9,12 +9,14 @@ import DeleteIcon from '@mui/icons-material/Delete';
 const AppointmentUpdateModal = props => {
     const auth = useContext(AuthContext)
     const [loading, setLoading] = useState(false)
-    const [userId, setUserId] = useState([])
-    const [animalId, setAnimalId] = useState([])
+    const [user_id, setUserId] = useState([])
+    const [animal_id, setAnimalId] = useState([])
     const [time, setTime] = useState('')
     const [status, setStatus] = useState('')
     const [enclosure_id, setEnclosureId] = useState('')
     const [enclosures, setEnclosures] = useState([])
+    const [animals, setAnimals] = useState([])
+
     const [users, setUsers] = useState([])
     const [name, setName] = useState('')
 
@@ -29,17 +31,23 @@ const AppointmentUpdateModal = props => {
     }, [props.enclosure])
 
     useEffect(() => {
-        if (auth.user) return
         api.getUsers(auth.userId ? { params: { user_id: auth.userId }} : {}).then((response) => {
-            setUserId(response.data.data)
+            setUsers(response.data.data)
         }).catch((error) => {
             console.log(error)
         })
-    }, [auth.user])
+    }, [auth.zoo])
+    useEffect(() => {
+        api.getAnimals(auth.userId ? { params: { user_id: auth.userId }} : {}).then((response) => {
+            setAnimals(response.data.data)
+        }).catch((error) => {
+            console.log(error)
+        })
+    }, [auth.zoo])
 
     const handleUpdate = () => {
         setLoading(true)
-        api.updateAppointmentById(props.appointment._id, { user_id: auth.user ? auth.user_id : userId }).then((response) => {
+        api.updateAppointmentById(props.appointment._id, { user_id: auth.user ? auth.user_id : user_id }).then((response) => {
             props.handleSuccess(response.data)
             setLoading(false)
         }).catch((error) => {
@@ -48,12 +56,12 @@ const AppointmentUpdateModal = props => {
     }
 
     return ( //IDK NAME PART OR MAP PART
-<ActionModal open={props.open} title={'Create an Appointment'} handleClose={props.handleClose}>
+<ActionModal open={props.open} title={'Update an Appointment'} handleClose={props.handleClose}>
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
                 <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
                     <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">User</InputLabel>
-                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="User" value={userId} onChange={(e) => setUserId(e.target.value)}>
+                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="User" value={user_id} onChange={(e) => setUserId(e.target.value)}>
                             {
                                 users.map((user, i) => {
                                     return (
@@ -65,9 +73,9 @@ const AppointmentUpdateModal = props => {
                     </FormControl>
                     <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">Animal</InputLabel>
-                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Animal" value={animalId} onChange={(e) => setAnimalId(e.target.value)}>
+                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Animal" value={animal_id} onChange={(e) => setAnimalId(e.target.value)}>
                             {
-                                enclosures.map((animal, i) => {
+                                animals.map((animal, i) => {
                                     return (
                                         <MenuItem key={i} value={animal._id}> {animal.name} </MenuItem>
                                     )
@@ -88,7 +96,7 @@ const AppointmentUpdateModal = props => {
                         <TextField label="Time" variant="outlined" sx={{ width: '100%' }} value={time} onChange={(e) => setTime(e.target.value)}/>
                     </div>
                 </div>
-                <Button label={'Create'} loading={false} onClick={handleUpdate} style={{ marginTop: 'auto' }}/>
+                <Button label={'Update'} loading={false} onClick={handleUpdate} style={{ marginTop: 'auto' }}/>
             </div>
         </ActionModal>
     )
@@ -97,19 +105,25 @@ const AppointmentUpdateModal = props => {
 const AppointmentCreateModal = props => {
     const auth = useContext(AuthContext)
     const [loading, setLoading] = useState(false)
-    const [userId, setUserId] = useState([])
-    const [animalId, setAnimalId] = useState([])
+    const [user_id, setUserId] = useState([])
+    const [animal_id, setAnimalId] = useState([])
     const [time, setTime] = useState('')
     const [status, setStatus] = useState('')
     const [enclosure_id, setEnclosureId] = useState('')
-    const [enclosures, setEnclosures] = useState([])
+    const [animals, setAnimals] = useState([])
     const [users, setUsers] = useState([])
     const [name, setName] = useState('')
 
     useEffect(() => {
-        if (auth.zoo) return
         api.getUsers(auth.userId ? { params: { user_id: auth.userId }} : {}).then((response) => {
-            setUserId(response.data.data)
+            setUsers(response.data.data)
+        }).catch((error) => {
+            console.log(error)
+        })
+    }, [auth.zoo])
+    useEffect(() => {
+        api.getAnimals(auth.userId ? { params: { user_id: auth.userId }} : {}).then((response) => {
+            setAnimals(response.data.data)
         }).catch((error) => {
             console.log(error)
         })
@@ -117,7 +131,7 @@ const AppointmentCreateModal = props => {
 
     const handleCreate = () => {
         setLoading(true)
-        api.createAppointment({ userId, animalId, time, status}).then((response) => {
+        api.createAppointment({ user_id, animal_id, time}).then((response) => {
             props.handleSuccess(response.data)
             setLoading(false)
         }).catch((error) => {
@@ -131,7 +145,7 @@ const AppointmentCreateModal = props => {
                         <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
                             <FormControl fullWidth>
                                 <InputLabel id="demo-simple-select-label">User</InputLabel>
-                                <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="User" value={userId} onChange={(e) => setUserId(e.target.value)}>
+                                <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="User" value={user_id} onChange={(e) => setUserId(e.target.value)}>
                                     {
                                         users.map((user, i) => {
                                             return (
@@ -143,9 +157,9 @@ const AppointmentCreateModal = props => {
                             </FormControl>
                             <FormControl fullWidth>
                                 <InputLabel id="demo-simple-select-label">Animal</InputLabel>
-                                <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Animal" value={animalId} onChange={(e) => setAnimalId(e.target.value)}>
+                                <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Animal" value={animal_id} onChange={(e) => setAnimalId(e.target.value)}>
                                     {
-                                        enclosures.map((animal, i) => {
+                                        animals.map((animal, i) => {
                                             return (
                                                 <MenuItem key={i} value={animal._id}> {animal.name} </MenuItem>
                                             )
@@ -185,7 +199,7 @@ const Appointments = props => {
 
     useEffect(() => {
         setLoading(true)
-        api.getUsers(auth.zooId ? { params: { zoo_id: auth.zooId }} : {}).then((response) => {
+        api.getAppointments(auth.zooId ? { params: { 'enclosure.zoo_id' : auth.zooId }} : {}).then((response) => {
             setLoading(false)
             setAppointments(response.data.data)
         }).catch((error) => {
