@@ -13,6 +13,11 @@ const AppointmentUpdateModal = props => {
     const [animalId, setAnimalId] = useState([])
     const [time, setTime] = useState('')
     const [status, setStatus] = useState('')
+    const [enclosure_id, setEnclosureId] = useState('')
+    const [enclosures, setEnclosures] = useState([])
+    const [users, setUsers] = useState([])
+    const [name, setName] = useState('')
+
 
     useEffect(() => {
         let { appointment } = props
@@ -26,7 +31,7 @@ const AppointmentUpdateModal = props => {
     useEffect(() => {
         if (auth.user) return
         api.getUsers(auth.userId ? { params: { user_id: auth.userId }} : {}).then((response) => {
-            setUsers(response.data.data)
+            setUserId(response.data.data)
         }).catch((error) => {
             console.log(error)
         })
@@ -43,28 +48,47 @@ const AppointmentUpdateModal = props => {
     }
 
     return ( //IDK NAME PART OR MAP PART
-        <ActionModal open={props.open} title={`Update the ${props.appointment ? props.appointment.name : 'name'}`} handleClose={props.handleClose}>
+<ActionModal open={props.open} title={'Create an Appointment'} handleClose={props.handleClose}>
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
-                { !auth.zoo ? <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
+                <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
                     <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">Zoo</InputLabel>
-                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Enclosure" value={zooId} onChange={(e) => setZooId(e.target.value)}>
+                        <InputLabel id="demo-simple-select-label">User</InputLabel>
+                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="User" value={userId} onChange={(e) => setUserId(e.target.value)}>
                             {
-                                zoos.map((zoo, i) => {
+                                users.map((user, i) => {
                                     return (
-                                        <MenuItem key={i} value={zoo._id}> {zoo.city}, {zoo.state} Zoo </MenuItem>
+                                        <MenuItem key={i} value={user._id}> {user.name} </MenuItem>
                                     )
                                 })
                             }
                         </Select>
                     </FormControl>
-                </div> : null }
+                    <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label">Animal</InputLabel>
+                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Animal" value={animalId} onChange={(e) => setAnimalId(e.target.value)}>
+                            {
+                                enclosures.map((animal, i) => {
+                                    return (
+                                        <MenuItem key={i} value={animal._id}> {animal.name} </MenuItem>
+                                    )
+                                })
+                            }
+                        </Select>
+                    </FormControl>
+                    <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label">Status</InputLabel>
+                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Status" value={status} onChange={(e) => setStatus(e.target.value)}>
+                                <MenuItem value={"Completed"}> Completed </MenuItem>
+                                <MenuItem value={"Uncompleted"}> Uncompleted </MenuItem>
+                        </Select>
+                    </FormControl>
+                </div>
                 <div style={{ display: 'flex', marginBottom: '20px' }}>
-                    <div style={{ width: '100%' }}>
-                        <TextField label="Name" variant="outlined" sx={{ width: '100%' }} value={name} onChange={(e) => setName(e.target.value)}/>
+                    <div style={{ width: '100%', marginRight: '10px' }}>
+                        <TextField label="Time" variant="outlined" sx={{ width: '100%' }} value={time} onChange={(e) => setTime(e.target.value)}/>
                     </div>
                 </div>
-                <Button label={'Update'} loading={false} onClick={handleUpdate} style={{ marginTop: 'auto' }}/>
+                <Button label={'Create'} loading={false} onClick={handleUpdate} style={{ marginTop: 'auto' }}/>
             </div>
         </ActionModal>
     )
@@ -77,11 +101,15 @@ const AppointmentCreateModal = props => {
     const [animalId, setAnimalId] = useState([])
     const [time, setTime] = useState('')
     const [status, setStatus] = useState('')
+    const [enclosure_id, setEnclosureId] = useState('')
+    const [enclosures, setEnclosures] = useState([])
+    const [users, setUsers] = useState([])
+    const [name, setName] = useState('')
 
     useEffect(() => {
         if (auth.zoo) return
         api.getUsers(auth.userId ? { params: { user_id: auth.userId }} : {}).then((response) => {
-            setZoos(response.data.data)
+            setUserId(response.data.data)
         }).catch((error) => {
             console.log(error)
         })
@@ -89,9 +117,7 @@ const AppointmentCreateModal = props => {
 
     const handleCreate = () => {
         setLoading(true)
-
-        //IDK
-        api.createAppointment({ user_id: auth.user ? auth.user._id : userId }).then((response) => {
+        api.createAppointment({ userId, animalId, time, status}).then((response) => {
             props.handleSuccess(response.data)
             setLoading(false)
         }).catch((error) => {
@@ -101,23 +127,48 @@ const AppointmentCreateModal = props => {
 
     return (
         <ActionModal open={props.open} title={'Create an Appointment'} handleClose={props.handleClose}>
-            <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
-                { !auth.user ? <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
-                    <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">User</InputLabel>
-                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Appointment" value={userId} onChange={(e) => setUserId(e.target.value)}>
-
-                        </Select>
-                    </FormControl>
-                </div> : null }
-                <div style={{ display: 'flex', marginBottom: '20px' }}>
-                    <div style={{ width: '100%' }}>
-                        <TextField label="Name" variant="outlined" sx={{ width: '100%' }} value={name} onChange={(e) => setName(e.target.value)}/>
+                    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
+                        <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
+                            <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-label">User</InputLabel>
+                                <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="User" value={userId} onChange={(e) => setUserId(e.target.value)}>
+                                    {
+                                        users.map((user, i) => {
+                                            return (
+                                                <MenuItem key={i} value={user._id}> {user.name} </MenuItem>
+                                            )
+                                        })
+                                    }
+                                </Select>
+                            </FormControl>
+                            <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-label">Animal</InputLabel>
+                                <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Animal" value={animalId} onChange={(e) => setAnimalId(e.target.value)}>
+                                    {
+                                        enclosures.map((animal, i) => {
+                                            return (
+                                                <MenuItem key={i} value={animal._id}> {animal.name} </MenuItem>
+                                            )
+                                        })
+                                    }
+                                </Select>
+                            </FormControl>
+                            <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-label">Status</InputLabel>
+                                <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Status" value={status} onChange={(e) => setStatus(e.target.value)}>
+                                        <MenuItem value={"Completed"}> Completed </MenuItem>
+                                        <MenuItem value={"Uncompleted"}> Uncompleted </MenuItem>
+                                </Select>
+                            </FormControl>
+                        </div>
+                        <div style={{ display: 'flex', marginBottom: '20px' }}>
+                            <div style={{ width: '100%', marginRight: '10px' }}>
+                                <TextField label="Time" variant="outlined" sx={{ width: '100%' }} value={time} onChange={(e) => setTime(e.target.value)}/>
+                            </div>
+                        </div>
+                        <Button label={'Create'} loading={false} onClick={handleCreate} style={{ marginTop: 'auto' }}/>
                     </div>
-                </div>
-                <Button label={'Create'} loading={loading} onClick={handleCreate} style={{ marginTop: 'auto' }}/>
-            </div>
-        </ActionModal>
+                </ActionModal>
     )
 }
 
@@ -130,26 +181,26 @@ const Appointments = props => {
     const [updateOpen, setUpdateOpen] = useState(false)
     const [updateAppointment, setUpdateAppointment] = useState(null)
 
-    const [appointments, setApointments] = useState([])
+    const [appointments, setAppointments] = useState([])
 
     useEffect(() => {
         setLoading(true)
-        api.getEnclosures(auth.userId ? { params: { user_id: auth.userId }} : {}).then((response) => {
+        api.getUsers(auth.zooId ? { params: { zoo_id: auth.zooId }} : {}).then((response) => {
             setLoading(false)
-            setEnclosures(response.data.data)
+            setAppointments(response.data.data)
         }).catch((error) => {
             setLoading(false)
         })
     }, [auth.zoo])
 
-    const handleUpdateStart = (enclosure) => {
+    const handleUpdateStart = (appointment) => {
         setUpdateOpen(true)
         setUpdateAppointment(appointment)
     }
 
     const handleDelete = (appointment_id) => {
         api.deleteAppointmentById(appointment_id).then((response) => {
-            setAppointments([...appointments.filter((enclosure) => appointment_id._id !== response.data._id)])
+            setAppointments([...appointments.filter((appointment) => appointment_id._id !== response.data._id)])
         }).catch((error) => {
             console.log(error)
         })
@@ -164,7 +215,7 @@ const Appointments = props => {
 
     const handleCreateSuccess = (appointment) => {
         setCreateOpen(false)
-        setEnclosures([appointment, ...appointments])
+        setAppointments([appointment, ...appointments])
     }
 
     return (
