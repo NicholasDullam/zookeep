@@ -7,87 +7,40 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 const AnimalViewModal = props => {
-    const auth = useContext(AuthContext)
-    const [loading, setLoading] = useState(false)
-    const [name, setName] = useState('')
-    const [enclosure_id, setEnclosureId] = useState('')
-    const [species, setSpecies] = useState('')
-    const [image_url, setImageUrl] = useState('')
-    const [food_type, setFoodType] = useState('')
-    const [enclosures, setEnclosures] = useState([])
-    const [health, setHealth] = useState([])
-
-
+    const [enclosure, setEnclosure] = useState(null)
+    
     useEffect(() => {
-        let { animal } = props
-        if (!animal) return
-        setName(animal.name)
-        setSpecies(animal.species)
-        setImageUrl(animal.image_url)
-        setFoodType(animal.food_type)
-        setEnclosureId(animal.enclosure_id)
-    }, [props.animal])
-
-    useEffect(() => {
-        api.getEnclosures(auth.zooId ? { params: { zoo_id: auth.zooId }} : {}).then((response) => {
-            setEnclosures(response.data.data)
+        if (!props.animal) return
+        api.getEnclosures({ params: { _id: props.animal.enclosure_id } }).then((response) => {
+            if (response.data.data.length) setEnclosure(response.data.data[0])
         }).catch((error) => {
             console.log(error)
         })
-    }, [auth.zoo])
-
-    useEffect(() => {
-        setLoading(true)
-        api.getHealth(auth.zooId ? { params: { 'enclosure.zoo_id' : auth.zooId }} : {}).then((response) => {
-            setLoading(false)
-            setHealth(response.data.data)
-        }).catch((error) => {
-            setLoading(false)
-        })
-    }, [auth.zoo])
-
+    }, [props.animal])
 
     return (
         <ActionModal open={props.open} title={` ${props.animal ? props.animal.name : 'name'}`} handleClose={props.handleClose}>
-            <div  style={{ display: 'block', width: '40%',  marginLeft: 'auto', marginRight: 'auto', marginBottom: '20px'}}>
-                <img src={image_url} style={{ height: '90px', width: '90px',borderRadius: '50%'}}/>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
-                <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
-                    <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">Enclosure</InputLabel>
-                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Enclosure" value={enclosure_id} onChange={(e) => setEnclosureId(e.target.value)}>
-                            {
-                                enclosures.map((enclosure, i) => {
-                                    return (
-                                        <MenuItem key={i} value={enclosure._id}> {enclosure.name} </MenuItem>
-                                    )
-                                })
-                            }
-                        </Select>
-                    </FormControl>
+            { props.animal ? <div>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <img src={props.animal.image_url} style={{ height: '80px', width: '80px',borderRadius: '50%', objectFit: 'cover' }}/>
                 </div>
-                <div style={{ display: 'flex', marginBottom: '20px' }}>
+                <h3> Attributes </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
                     <div style={{ width: '100%', marginRight: '10px' }}>
-                        <TextField label="Name" variant="outlined" sx={{ width: '100%' }} value={name} onChange={(e) => setName(e.target.value)}/>
+                        Enclosure: { enclosure ? enclosure.name : null }
+                    </div>
+                    <div style={{ width: '100%', marginRight: '10px' }}>
+                        Name: {props.animal.name}
                     </div>
                     <div style={{ width: '100%' }}>
-                        <TextField label="Species" variant="outlined" sx={{ width: '100%' }} value={species} onChange={(e) => setSpecies(e.target.value)}/>
+                        Species: {props.animal.species}
                     </div>
-                </div>
-                <div style={{ display: 'flex' }}>
                     <div style={{ width: '100%', marginRight: '10px' }}>
-                        <TextField label="Food Type" variant="outlined" sx={{ width: '100%' }} value={food_type} onChange={(e) => setFoodType(e.target.value)}/>
+                        Food Type: {props.animal.food_type}
                     </div>
-                    <div style={{ width: '100%' }}>
-                        <TextField label="Image URL" variant="outlined" sx={{ width: '100%' }} value={image_url} onChange={(e) => setImageUrl(e.target.value)}/>
-                    </div>
+                    <h3>Health Data</h3>
                 </div>
-                <div>
-                    <h6>Health Data: </h6>
-                </div>
-
-            </div>
+            </div> : null }
         </ActionModal>
     )
 }
@@ -265,7 +218,8 @@ const Animals = props => {
         setAnimals([animal, ...animals])
     }
 
-    const handleUpdateStart = (animal) => {
+    const handleUpdateStart = (event, animal) => {
+        event.stopPropagation()
         setUpdateOpen(true)
         setUpdateAnimal(animal)
     }
@@ -281,7 +235,8 @@ const Animals = props => {
         setAnimals(newAnimals)
     }
 
-    const handleDelete = (animal_id) => {
+    const handleDelete = (event, animal_id) => {
+        event.stopPropagation()
         api.deleteAnimalById(animal_id).then((response) => {
             setAnimals([...animals.filter((animal) => animal._id !== response.data._id)])
         }).catch((error) => {
@@ -307,25 +262,25 @@ const Animals = props => {
                             <TableRow>
                                 <TableCell> Image URL </TableCell>
                                 <TableCell> ID </TableCell>
+                                <TableCell> Enclosure_ID </TableCell>
                                 <TableCell> Name </TableCell>
                                 <TableCell> Species </TableCell>
                                 <TableCell> Food Type </TableCell>
-                                <TableCell> Enclosure ID </TableCell>
                             </TableRow>
                         </TableHead>
                         {
                             animals.map((animal, i) => {
                                 return (
-                                    <TableRow key={i} sx={{ position: 'relative' }}>
-                                        <TableCell> <img src={animal.image_url} style={{ height: '30px', width: '30px', borderRadius: '50%', cursor: 'pointer'}} onClick={() => handleViewOpen(animal)}/> </TableCell>
+                                    <TableRow key={i} sx={{ position: 'relative', cursor: 'pointer' }} onClick={() => handleViewOpen(animal)}>
+                                        <TableCell> <img src={animal.image_url} style={{ height: '30px', width: '30px', borderRadius: '50%', cursor: 'pointer'}}/> </TableCell>
                                         <TableCell> {animal._id} </TableCell>
+                                        <TableCell> {animal.enclosure_id} </TableCell>
                                         <TableCell> {animal.name} </TableCell>
                                         <TableCell> {animal.species} </TableCell>
                                         <TableCell> {animal.food_type} </TableCell>
-                                        <TableCell> {animal.enclosure_id} </TableCell>
                                         <div style={{ display: 'flex', position: 'absolute', right: '20px', top: '50%', transform: 'translateY(-50%)'}}>
-                                            <EditIcon style={{ marginRight: '10px', fontSize: '20px', cursor: 'pointer' }} onClick={() => handleUpdateStart(animal)}/>
-                                            <DeleteIcon style={{ fontSize: '20px', cursor: 'pointer' }} onClick={() => handleDelete(animal._id)}/>
+                                            <EditIcon style={{ marginRight: '10px', fontSize: '20px', cursor: 'pointer' }} onClick={(event) => handleUpdateStart(event, animal)}/>
+                                            <DeleteIcon style={{ fontSize: '20px', cursor: 'pointer' }} onClick={(event) => handleDelete(event, animal._id)}/>
                                         </div>
                                     </TableRow>                                
                                 )

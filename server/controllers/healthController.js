@@ -1,19 +1,32 @@
 const Health = require('../models/health')
+const Animal = require('../models/animal')
 const mongoose = require('mongoose')
 
-const createHealth = (req, res) => {
+const createHealth = async (req, res) => {
     let { name, heart_rate, weight, notes, metadata, animal_id } = req.body
     if (!name || !heart_rate || !weight || !notes || !metadata || !animal_id) return res.status(400).json({ error: 'Missing Fields' })
-    let health = new Health({ name, heart_rate, weight, notes, metadata, animal_id })
-    health.save().then((response) => {
+    
+    // starts transaction to check if animal exists
+    let session = await mongoose.startSession()
+    session.startTransaction()    
+    
+    try { 
+        const animal = Animal.findById(animal_id)
+        if (!animal) throw new Error('animal does not exist')
+        let health = new Health({ name, heart_rate, weight, notes, metadata, animal_id })
+        const response = health.save()
+        await session.commitTransaction()
+        session.endSession()
         return res.status(200).json(response)
-    }).catch((error) => {
+    } catch (error) {
+        await session.abortTransaction()
+        session.endSession()
         return res.status(400).json({ error: error.message })
-    })
+    }
 }
 
 const getHealth = (req, res) => {
-    let query = { ...req.query }, subquery = {}, reserved = ['sort', 'skip', 'limit', 'q'], indices = ['enclosure.zoo_id'], subqueryParams=['enclosure.zoo_id'], pipeline = []
+    let query = { ...req.query }, subquery = {}, reserved = ['sort', 'skip', 'limit', 'q'], indices = ['user.zoo_id', 'user_id', 'animal_id'], subqueryParams=['user.zoo_id'], pipeline = []
     
     indices.forEach((el) => {
         if (query[el]) query[el] = mongoose.Types.ObjectId(query[el])
@@ -32,8 +45,8 @@ const getHealth = (req, res) => {
 
     pipeline.push({ $match: query })
     if (Object.entries(subquery).length) {
-        pipeline.push({ $lookup: { from: 'enclosures', localField: 'enclosure_id', foreignField: '_id', as: 'enclosure' }})
-        pipeline.push({ $unwind: '$enclosure' })
+        pipeline.push({ $lookup: { from: 'user', localField: 'user_id', foreignField: '_id', as: 'user' }})
+        pipeline.push({ $unwind: '$user' })
         pipeline.push({ $match: subquery })
     }
 

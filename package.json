@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/NicholasDullam/zookeep/issues"
   },
-  "homepage": "https://github.com/NicholasDullam/zookeep#readme"
+  "homepage": "https://github.com/NicholasDullam/zookeep#readme",
+  "dependencies": {
+    "start": "^5.1.0"
+  }
 }
