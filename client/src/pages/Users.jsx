@@ -228,15 +228,15 @@ const UserViewModal = (props) => {
                 <h3> Actions </h3>
                 {
                     actions.length ? actions.map((action) => {
-                        return <p> {action.name} </p>
-                    }) : <p style={{ textAlign: 'center' }}> None </p>
+                        return <div> {action.name} </div>
+                    }) : <div style={{ textAlign: 'center' }}> None </div>
                 }
                 { props.user.role === 'manager' ? <div>
                     <h3> Employees </h3>
                     {
                         employees.length ? employees.map((employee) => {
-                            return <p> {employee.name} </p>
-                        }) : <p style={{ textAlign: 'center' }}> None </p>
+                            return <div> {employee.name} </div>
+                        }) : <div style={{ textAlign: 'center' }}> None </div>
                     }
                 </div> : null }
             </div> : null }

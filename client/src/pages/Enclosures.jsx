@@ -6,6 +6,57 @@ import AuthContext from '../context/AuthContext';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
+const EnclosureViewModal = props => {
+    const [animals, setAnimals] = useState([])
+    const [zoo, setZoo] = useState(null)
+    
+    useEffect(() => {
+        if (!props.enclosure) return
+        api.getAnimals({ params: { enclosure_id: props.enclosure._id } }).then((response) => {
+            setAnimals(response.data.data)
+        }).catch((error) => {
+            console.log(error)
+        })
+    }, [props.enclosure])
+
+    useEffect(() => {
+        if (!props.enclosure) return
+        api.getZoos({ params: { zoo_id: props.enclosure.zoo_id } }).then((response) => {
+            if (!response.data.data.length) setZoo(response.data.data[0])
+        }).catch((error) => {
+            console.log(error)
+        })
+    }, [props.enclosure])
+
+    return (
+        <ActionModal open={props.open} title={` ${props.enclosure ? props.enclosure.name : 'name'}`} handleClose={props.handleClose}>
+            { props.enclosure ? <div>
+                <h3> Attributes </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
+                    <div style={{ width: '100%', marginRight: '10px' }}>
+                        Zoo: {zoo ? `${zoo.city}, ${zoo.state}` : null}
+                    </div>
+                    <div style={{ width: '100%', marginRight: '10px' }}>
+                        Name: {props.enclosure.name}
+                    </div>
+                    <div style={{ width: '100%' }}>
+                        Perimeter: {props.enclosure.perimeter}
+                    </div>
+                    <h3>Animals</h3>
+                    {
+                        animals.map((animal) => {
+                            return <div>
+                                {animal.name}
+                            </div>
+                        })
+                    }
+                </div>
+            </div> : null }
+        </ActionModal>
+    )
+}
+
+
 const EnclosureUpdateModal = props => {
     const auth = useContext(AuthContext)
     const [loading, setLoading] = useState(false)
@@ -127,6 +178,9 @@ const Enclosures = props => {
 
     const [createOpen, setCreateOpen] = useState(false)
 
+    const [viewOpen, setViewOpen] = useState(false)
+    const [viewEnclosure, setViewEnclosure] = useState(null)
+
     const [updateOpen, setUpdateOpen] = useState(false)
     const [updateEnclosure, setUpdateEnclosure] = useState(null)
 
@@ -142,12 +196,19 @@ const Enclosures = props => {
         })
     }, [auth.zoo])
 
-    const handleUpdateStart = (enclosure) => {
+    const handleViewStart = (enclosure) => {
+        setViewOpen(true)
+        setViewEnclosure(enclosure)
+    }
+
+    const handleUpdateStart = (event, enclosure) => {
+        event.stopPropagation()
         setUpdateOpen(true)
         setUpdateEnclosure(enclosure)
     }
 
-    const handleDelete = (enclosure_id) => {
+    const handleDelete = (event, enclosure_id) => {
+        event.stopPropagation()
         api.deleteEnclosureById(enclosure_id).then((response) => {
             setEnclosures([...enclosures.filter((enclosure) => enclosure._id !== response.data._id)])
         }).catch((error) => {
@@ -171,6 +232,7 @@ const Enclosures = props => {
         <Page name={'Enclosures'}>
             <EnclosureCreateModal open={createOpen} handleClose={() => setCreateOpen(false)} handleSuccess={handleCreateSuccess}/>
             <EnclosureUpdateModal open={updateOpen} enclosure={updateEnclosure} handleClose={() => setUpdateOpen(false)} handleSuccess={handleUpdateSuccess}/>
+            <EnclosureViewModal open={viewOpen} enclosure={viewEnclosure} handleClose={() => setViewOpen(false)}/>
             <p style={{ textAlign: 'left', color: 'blue', marginTop: '10px', cursor: 'pointer' }} onClick={() => setCreateOpen(true)}> + Create </p>
             { loading ? <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <CircularProgress size={30}/>
@@ -188,14 +250,14 @@ const Enclosures = props => {
                         {
                             enclosures.map((enclosure, i) => {
                                 return (
-                                    <TableRow key={i} style={{ position: 'relative' }}>
+                                    <TableRow key={i} style={{ position: 'relative', cursor: 'pointer' }} onClick={() => handleViewStart(enclosure)}>
                                         <TableCell> {enclosure._id} </TableCell>
                                         <TableCell> {enclosure.name} </TableCell>
                                         <TableCell> {enclosure.perimeter.toString() || 'None'} </TableCell>
                                         <TableCell> {enclosure.zoo_id} </TableCell>
                                         <div style={{ display: 'flex', position: 'absolute', right: '20px', top: '50%', transform: 'translateY(-50%)'}}>
-                                            <EditIcon style={{ marginRight: '10px', fontSize: '20px', cursor: 'pointer' }} onClick={() => handleUpdateStart(enclosure)}/>
-                                            <DeleteIcon style={{ fontSize: '20px', cursor: 'pointer' }} onClick={() => handleDelete(enclosure._id)}/>
+                                            <EditIcon style={{ marginRight: '10px', fontSize: '20px', cursor: 'pointer' }} onClick={(event) => handleUpdateStart(event, enclosure)}/>
+                                            <DeleteIcon style={{ fontSize: '20px', cursor: 'pointer' }} onClick={(event) => handleDelete(event, enclosure._id)}/>
                                         </div>
                                     </TableRow>                                
                                 )
