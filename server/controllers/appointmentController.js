@@ -1,14 +1,32 @@
 const Appointment = require('../models/appointment')
+const User = require('../models/user')
+const Animal = require('../models/animal')
+const Enclosure = require('../models/enclosure')
+const mongoose = require('mongoose')
 
 const createAppointment = (req, res) => {
     let { user_id, animal_id, time, status } = req.body
     if (!user_id || !animal_id || !time || !status) return res.status(400).json({ error: 'Missing Fields' })
-    let appointment = new Appointment({ user_id, animal_id, time, status })
-    appointment.save().then((response) => {
+
+    // starts transaction to check if user and enclosure exist
+    let session = await mongoose.startSession()
+    session.startTransaction()
+
+    try {
+        const user = await User.findById(user_id)
+        if (!user) throw new Error('user does not exist')
+        const animal = await Animal.findById(animal_id)
+        if (!animal) throw new Error('animal does not exist')
+        let appointment = new Appointment({ user_id, animal_id, time, status })
+        const response = await action.save()
+        await session.commitTransaction()
+        session.endSession()
         return res.status(200).json(response)
-    }).catch((error) => {
+    } catch (error) { 
+        await session.abortTransaction()
+        session.endSession()
         return res.status(400).json({ error: error.message })
-    })
+    }
 }
 
 const getAppointments = (req, res) => {
