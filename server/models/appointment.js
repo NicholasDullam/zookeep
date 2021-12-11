@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 const Appointment = new mongoose.Schema({
     user_id: { type: mongoose.Types.ObjectId, ref: 'users' },
     animal_id: { type: mongoose.Types.ObjectId, ref: 'animals' },
-    time: { type: String, required: true },
+    time: { type: Date, required: true },
     status: { type: String, default: 'pending' },
 }, {
     timestamps: {

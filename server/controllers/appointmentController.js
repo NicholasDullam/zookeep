@@ -16,7 +16,7 @@ const createAppointment = async (req, res) => {
         if (!animal) throw new Error('animal does not exist')
         const user = await User.findById(user_id)
         if (!user) throw new Error('user does not exist')
-        let appointment = new Appointment({ user_id, animal_id, time, status })
+        let appointment = new Appointment({ user_id, animal_id, time })
         const response = await appointment.save()
         await session.commitTransaction()
         session.endSession()

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Page, ActionModal, Button } from '../components'
 import { TextField, Select, Table, TableContainer, TableCell, TableHead, CircularProgress, TableRow, FormControl, InputLabel } from '@mui/material'
 import { MenuItem } from '@material-ui/core'
+import { DateTimePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
+import DateFnsUtils from '@date-io/date-fns';
 import api from '../api'
 import AuthContext from '../context/AuthContext';
 import EditIcon from '@mui/icons-material/Edit';
@@ -12,7 +14,7 @@ const AppointmentUpdateModal = props => {
     const [loading, setLoading] = useState(false)
     const [user_id, setUserId] = useState([])
     const [animal_id, setAnimalId] = useState([])
-    const [time, setTime] = useState('')
+    const [time, setTime] = useState(new Date())
     const [status, setStatus] = useState('')
     const [enclosure_id, setEnclosureId] = useState('')
     const [enclosures, setEnclosures] = useState([])
@@ -29,7 +31,7 @@ const AppointmentUpdateModal = props => {
         setAnimalId(appointment.animal_id)
         setTime(appointment.time)
         setStatus(appointment.status)
-    }, [props.enclosure])
+    }, [props.appointment])
 
     useEffect(() => {
         api.getUsers(auth.userId ? { params: { user_id: auth.userId }} : {}).then((response) => {
@@ -72,6 +74,8 @@ const AppointmentUpdateModal = props => {
                             }
                         </Select>
                     </FormControl>
+                    </div>
+                    <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
                     <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">Animal</InputLabel>
                         <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Animal" value={animal_id} onChange={(e) => setAnimalId(e.target.value)}>
@@ -84,6 +88,8 @@ const AppointmentUpdateModal = props => {
                             }
                         </Select>
                     </FormControl>
+                    </div>
+                    <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
                     <FormControl fullWidth>
                         <InputLabel id="demo-simple-select-label">Status</InputLabel>
                         <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Status" value={status} onChange={(e) => setStatus(e.target.value)}>
@@ -97,6 +103,15 @@ const AppointmentUpdateModal = props => {
                         <TextField label="Time" variant="outlined" sx={{ width: '100%' }} value={time} onChange={(e) => setTime(e.target.value)}/>
                     </div>
                 </div>
+                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <DateTimePicker
+                        label="DateTimePicker"
+                        inputVariant="outlined"
+                        value={time}
+                        onChange={setTime}
+                    
+                    />
+                </MuiPickersUtilsProvider>
                 <Button label={'Update'} loading={false} onClick={handleUpdate} style={{ marginTop: 'auto' }}/>
             </div>
         </ActionModal>
@@ -108,7 +123,7 @@ const AppointmentCreateModal = props => {
     const [loading, setLoading] = useState(false)
     const [user_id, setUserId] = useState([])
     const [animal_id, setAnimalId] = useState([])
-    const [time, setTime] = useState('')
+    const [time, setTime] = useState(new Date())
     const [status, setStatus] = useState('')
     const [enclosure_id, setEnclosureId] = useState('')
     const [animals, setAnimals] = useState([])
@@ -156,6 +171,8 @@ const AppointmentCreateModal = props => {
                                     }
                                 </Select>
                             </FormControl>
+                            </div>
+                            <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
                             <FormControl fullWidth>
                                 <InputLabel id="demo-simple-select-label">Animal</InputLabel>
                                 <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Animal" value={animal_id} onChange={(e) => setAnimalId(e.target.value)}>
@@ -168,6 +185,8 @@ const AppointmentCreateModal = props => {
                                     }
                                 </Select>
                             </FormControl>
+                            </div>
+                            <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
                             <FormControl fullWidth>
                                 <InputLabel id="demo-simple-select-label">Status</InputLabel>
                                 <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Status" value={status} onChange={(e) => setStatus(e.target.value)}>
@@ -181,7 +200,16 @@ const AppointmentCreateModal = props => {
                                 <TextField label="Time" variant="outlined" sx={{ width: '100%' }} value={time} onChange={(e) => setTime(e.target.value)}/>
                             </div>
                         </div>
-                        <Button label={'Create'} loading={false} onClick={handleCreate} style={{ marginTop: 'auto' }}/>
+                        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                            <DateTimePicker
+                                label="DateTimePicker"
+                                inputVariant="outlined"
+                                value={time}
+                                onChange={setTime}
+                            
+                            />
+                        </MuiPickersUtilsProvider>
+                       <Button label={'Create'} loading={false} onClick={handleCreate} style={{ marginTop: 'auto' }}/>
                     </div>
                 </ActionModal>
     )
