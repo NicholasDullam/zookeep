@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { Navbar, ActionModal, Button } from './components' 
-import { Animals, Enclosures, Home, Actions } from './pages'
+import { Animals, Enclosures, Home, Actions, Users } from './pages'
 import { List, ListItemButton, TextField } from '@mui/material'
 import api from './api'
 import './App.css';
@@ -209,6 +209,7 @@ const App = (props) => {
                 <Route path='/actions' exact component={Actions}/>
                 <Route path='/enclosures' exact component={Enclosures}/>
                 <Route path='/animals' exact component={Animals}/>
+                <Route path='/users' exact component={Users}/>
                 <Route path='/' component={Home}/>
               </Switch>
             </div>

@@ -15,7 +15,7 @@ const createAction = (req, res) => {
 }
 
 const getActions = (req, res) => {
-    let query = { ...req.query }, subquery = {}, reserved = ['sort', 'skip', 'limit', 'q'], indices = ['enclosure.zoo_id'], subqueryParams=['enclosure.zoo_id'], pipeline = []
+    let query = { ...req.query }, subquery = {}, reserved = ['sort', 'skip', 'limit', 'q'], indices = ['enclosure.zoo_id', 'user_id'], subqueryParams=['enclosure.zoo_id'], pipeline = []
     
     indices.forEach((el) => {
         if (query[el]) query[el] = mongoose.Types.ObjectId(query[el])

@@ -24,7 +24,10 @@ const updateZooById = (zoo_id, payload) => connection.put(`/zoos/${zoo_id}`, pay
 const deleteZooById = (zoo_id) => connection.delete(`/zoos/${zoo_id}`)
 
 // user routes
+const createUser = (payload) => connection.post('/users', payload)
 const getUsers = (req) => connection.get('/users', req)
+const updateUserById = (user_id, payload) => connection.put(`/users/${user_id}`, payload)
+const deleteUserById = (user_id) => connection.delete(`/users/${user_id}`)
 
 // appointment routes
 const createAppointment = (payload) => connection.post('/appointments', payload)
@@ -51,7 +54,10 @@ let api = {
     getZoos,
     updateZooById,
     deleteZooById,
+    createUser,
     getUsers,
+    updateUserById,
+    deleteUserById,
     getAppointments,
     createAppointment,
     updateAppointmentById,
