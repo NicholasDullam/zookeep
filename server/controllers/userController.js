@@ -1,14 +1,25 @@
 const User = require('../models/user')
+const Zoo = require('../models/zoo')
 
-const createUser = (req, res) => {
+const createUser = async (req, res) => {
     let { name, role, image_url, managed_by, zoo_id } = req.body
     if (!name || !role || !image_url || !zoo_id) return res.status(400).json({ error: 'Missing Fields' })
-    let user = new User({ name, role, image_url, managed_by, zoo_id })
-    user.save().then((response) => {
+
+    // starts transaction to check if zoo exists
+    let session = await Zoo.startSession()
+    session.startTransaction()
+
+    try {
+        const zoo = await Zoo.findById(zoo_id)
+        if (!zoo) throw new Error('zoo does not exist')
+        let user = new User({ name, role, image_url, managed_by, zoo_id })
+        const response = await user.save()
+        await session.commitTransaction()
+        session.endSession()
         return res.status(200).json(response)
-    }).catch((error) => {
+    } catch (error) {
         return res.status(400).json({ error: error.message })
-    })
+    }
 }
 
 const getUsers = (req, res) => {
