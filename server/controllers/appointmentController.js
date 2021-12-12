@@ -41,7 +41,7 @@ const getAppointments = (req, res) => {
 
     subqueryParams.forEach((el) => {
         if (query[el]) {
-            subqueryUser[el] = query[el]
+            subquery[el] = query[el]
             delete query[el]
         }
     })
@@ -57,7 +57,6 @@ const getAppointments = (req, res) => {
     if (req.query.sort) pipeline.push({ $sort: getSort(req.query.sort) })
     if (req.query.skip) pipeline.push({ $skip: Number(req.query.skip) })
     if (req.query.limit) pipeline.push({ $limit: Number(req.query.limit) + 1 })
-
 
     Appointment.aggregate(pipeline).then((response) => {
         let results = { has_more: false, data: response }

@@ -31,14 +31,15 @@ const AppointmentUpdateModal = props => {
     }, [props.appointment])
 
     useEffect(() => {
-        api.getUsers(auth.userId ? { params: { user_id: auth.userId }} : {}).then((response) => {
+        api.getUsers(auth.zooId ? { params: { zoo_id: auth.zooId }} : {}).then((response) => {
             setUsers(response.data.data)
         }).catch((error) => {
             console.log(error)
         })
     }, [auth.zoo])
+    
     useEffect(() => {
-        api.getAnimals(auth.userId ? { params: { user_id: auth.userId }} : {}).then((response) => {
+        api.getAnimals(auth.zooId ? { params: { 'enclosure.zoo_id': auth.zooId }} : {}).then((response) => {
             setAnimals(response.data.data)
         }).catch((error) => {
             console.log(error)
@@ -47,7 +48,7 @@ const AppointmentUpdateModal = props => {
 
     const handleUpdate = () => {
         setLoading(true)
-        api.updateAppointmentById(props.appointment._id, { user_id: auth.user ? auth.user_id : user_id }).then((response) => {
+        api.updateAppointmentById(props.appointment._id, { user_id, animal_id, time }).then((response) => {
             props.handleSuccess(response.data)
             setLoading(false)
         }).catch((error) => {
@@ -86,23 +87,9 @@ const AppointmentUpdateModal = props => {
                         </Select>
                     </FormControl>
                     </div>
-                    <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
-                    <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">Status</InputLabel>
-                        <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Status" value={status} onChange={(e) => setStatus(e.target.value)}>
-                                <MenuItem value={"Completed"}> Completed </MenuItem>
-                                <MenuItem value={"Uncompleted"}> Uncompleted </MenuItem>
-                        </Select>
-                    </FormControl>
-                </div>
-                <div style={{ display: 'flex', marginBottom: '20px' }}>
-                    <div style={{ width: '100%', marginRight: '10px' }}>
-                        <TextField label="Time" variant="outlined" sx={{ width: '100%' }} value={time} onChange={(e) => setTime(e.target.value)}/>
-                    </div>
-                </div>
                 <MuiPickersUtilsProvider utils={DateFnsUtils}>
                     <DateTimePicker
-                        label="DateTimePicker"
+                        label="Time"
                         inputVariant="outlined"
                         value={time}
                         onChange={setTime}
@@ -167,14 +154,15 @@ const AppointmentCreateModal = props => {
     const [name, setName] = useState('')
 
     useEffect(() => {
-        api.getUsers(auth.userId ? { params: { user_id: auth.userId }} : {}).then((response) => {
+        api.getUsers(auth.zooId ? { params: { zoo_id: auth.zooId }} : {}).then((response) => {
             setUsers(response.data.data)
         }).catch((error) => {
             console.log(error)
         })
     }, [auth.zoo])
+
     useEffect(() => {
-        api.getAnimals(auth.userId ? { params: { user_id: auth.userId }} : {}).then((response) => {
+        api.getAnimals(auth.zooId ? { params: { 'enclosure.zoo_id': auth.zooId }} : {}).then((response) => {
             setAnimals(response.data.data)
         }).catch((error) => {
             console.log(error)
@@ -222,27 +210,13 @@ const AppointmentCreateModal = props => {
                                 </Select>
                             </FormControl>
                             </div>
-                            <div style={{ width: '100%', marginRight: '10px', marginBottom: '20px' }}>
-                            <FormControl fullWidth>
-                                <InputLabel id="demo-simple-select-label">Status</InputLabel>
-                                <Select labelId="demo-simple-select-label" sx={{ width: '100%' }} label="Status" value={status} onChange={(e) => setStatus(e.target.value)}>
-                                        <MenuItem value={"Completed"}> Completed </MenuItem>
-                                        <MenuItem value={"Uncompleted"}> Uncompleted </MenuItem>
-                                </Select>
-                            </FormControl>
-                        </div>
-                        <div style={{ display: 'flex', marginBottom: '20px' }}>
-                            <div style={{ width: '100%', marginRight: '10px' }}>
-                                <TextField label="Time" variant="outlined" sx={{ width: '100%' }} value={time} onChange={(e) => setTime(e.target.value)}/>
-                            </div>
-                        </div>
                         <MuiPickersUtilsProvider utils={DateFnsUtils}>
                             <DateTimePicker
-                                label="DateTimePicker"
+                                label="Time"
                                 inputVariant="outlined"
                                 value={time}
                                 onChange={setTime}
-                            
+                                style={{ marginBottom: '20px' }}
                             />
                         </MuiPickersUtilsProvider>
                        <Button label={'Create'} loading={false} onClick={handleCreate} style={{ marginTop: 'auto' }}/>
@@ -267,7 +241,7 @@ const Appointments = props => {
 
     useEffect(() => {
         setLoading(true)
-        api.getAppointments(auth.zooId ? { params: { 'enclosure.zoo_id' : auth.zooId }} : {}).then((response) => {
+        api.getAppointments(auth.zooId ? { params: { 'user.zoo_id' : auth.zooId }} : {}).then((response) => {
             setLoading(false)
             setAppointments(response.data.data)
         }).catch((error) => {
@@ -286,7 +260,7 @@ const Appointments = props => {
 
     const handleDelete = (appointment_id) => {
         api.deleteAppointmentById(appointment_id).then((response) => {
-            setAppointments([...appointments.filter((appointment) => appointment_id._id !== response.data._id)])
+            setAppointments([...appointments.filter((appointment) => appointment._id !== response.data._id)])
         }).catch((error) => {
             console.log(error)
         })
