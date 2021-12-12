@@ -3,6 +3,7 @@ const cors = require('cors')
 const express = require('express')
 const sslRedirect = require('heroku-ssl-redirect')
 const db = require('./db')
+const path = require('path')
 
 const app = express()
 const port = process.env.PORT || 8000
