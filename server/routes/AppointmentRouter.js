@@ -9,4 +9,4 @@ router.get('/appointments', AppointmentController.getAppointments)
 router.put('/appointments/:_id', AppointmentController.updateAppointmentById)
 router.delete('/appointments/:_id', AppointmentController.deleteAppointmentById)
 
-module.exports = router
+module.exports = router;
