@@ -1,5 +1,4 @@
 # ZooKeep
-CS 348 Project
 ### What is this?
 ### Getting started
 To prepare the production build and install relevant dependencies run...
